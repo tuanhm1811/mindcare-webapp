@@ -289,7 +289,7 @@ export const mockPatients: Patient[] = [
     totalSessions: 28,
     lastSessionDate: '2024-01-30',
     nextSessionDate: '2024-02-04',
-    status: 'active'
+    status: 'inactive'
   },
   {
     id: 'P004',
@@ -320,7 +320,7 @@ export const mockPatients: Patient[] = [
     treatmentStartDate: '2024-01-10',
     totalSessions: 6,
     lastSessionDate: '2024-01-25',
-    status: 'active'
+    status: 'discharged'
   },
   {
     id: 'P005',
@@ -982,6 +982,159 @@ export const dashboardStats = {
   pendingNotes: 3,
   upcomingAssessments: 5
 };
+
+// Action items for dashboard
+export interface ActionItem {
+  id: string;
+  type: 'note_due' | 'assessment_due' | 'follow_up' | 'treatment_plan' | 'lab_result';
+  title: string;
+  description: string;
+  patientId?: string;
+  patientName?: string;
+  priority: 'low' | 'medium' | 'high';
+  dueDate?: string;
+}
+
+export const mockActionItems: ActionItem[] = [
+  {
+    id: 'AI001',
+    type: 'note_due',
+    title: 'Hoàn thành ghi chú',
+    description: 'Buổi với Bùi Thị H ngày 02/02',
+    patientId: 'P008',
+    patientName: 'Bùi Thị H',
+    priority: 'high',
+    dueDate: '2024-02-04'
+  },
+  {
+    id: 'AI002',
+    type: 'assessment_due',
+    title: 'PHQ-9 định kỳ',
+    description: 'Đánh giá lại cho Nguyễn Văn A',
+    patientId: 'P001',
+    patientName: 'Nguyễn Văn A',
+    priority: 'medium',
+    dueDate: '2024-02-06'
+  },
+  {
+    id: 'AI003',
+    type: 'treatment_plan',
+    title: 'Review kế hoạch điều trị',
+    description: 'Cập nhật cho Lê Văn C sau 3 tháng',
+    patientId: 'P003',
+    patientName: 'Lê Văn C',
+    priority: 'high',
+    dueDate: '2024-02-05'
+  },
+  {
+    id: 'AI004',
+    type: 'lab_result',
+    title: 'Xét nghiệm Lithium',
+    description: 'Kiểm tra kết quả cho Lê Văn C',
+    patientId: 'P003',
+    patientName: 'Lê Văn C',
+    priority: 'high',
+    dueDate: '2024-02-03'
+  },
+  {
+    id: 'AI005',
+    type: 'follow_up',
+    title: 'Gọi theo dõi',
+    description: 'Hoàng Văn E - kiểm tra exposure homework',
+    patientId: 'P005',
+    patientName: 'Hoàng Văn E',
+    priority: 'medium',
+    dueDate: '2024-02-04'
+  }
+];
+
+// Clinical outcomes data for charts (PHQ-9/GAD-7 trends)
+export interface ClinicalOutcome {
+  patientId: string;
+  patientName: string;
+  assessmentType: 'PHQ9' | 'GAD7' | 'PCL5';
+  scores: { date: string; score: number; maxScore: number }[];
+  trend: 'improving' | 'stable' | 'declining';
+}
+
+export const mockClinicalOutcomes: ClinicalOutcome[] = [
+  {
+    patientId: 'P001',
+    patientName: 'Nguyễn Văn A',
+    assessmentType: 'PHQ9',
+    scores: [
+      { date: '2024-01-01', score: 18, maxScore: 27 },
+      { date: '2024-01-15', score: 14, maxScore: 27 },
+      { date: '2024-02-01', score: 9, maxScore: 27 }
+    ],
+    trend: 'improving'
+  },
+  {
+    patientId: 'P002',
+    patientName: 'Trần Thị B',
+    assessmentType: 'GAD7',
+    scores: [
+      { date: '2024-01-15', score: 15, maxScore: 21 },
+      { date: '2024-01-28', score: 12, maxScore: 21 },
+      { date: '2024-02-01', score: 8, maxScore: 21 }
+    ],
+    trend: 'improving'
+  },
+  {
+    patientId: 'P005',
+    patientName: 'Hoàng Văn E',
+    assessmentType: 'PCL5',
+    scores: [
+      { date: '2024-01-01', score: 62, maxScore: 80 },
+      { date: '2024-01-15', score: 55, maxScore: 80 },
+      { date: '2024-01-29', score: 45, maxScore: 80 }
+    ],
+    trend: 'improving'
+  },
+  {
+    patientId: 'P006',
+    patientName: 'Vũ Thị F',
+    assessmentType: 'GAD7',
+    scores: [
+      { date: '2024-01-10', score: 14, maxScore: 21 },
+      { date: '2024-01-24', score: 13, maxScore: 21 },
+      { date: '2024-02-01', score: 14, maxScore: 21 }
+    ],
+    trend: 'stable'
+  }
+];
+
+// Caseload summary
+export function getCaseloadSummary() {
+  const activePatients = mockPatients.filter(p => p.status === 'active');
+  return {
+    total: activePatients.length,
+    byRisk: {
+      high: activePatients.filter(p => p.riskLevel === 'high').length,
+      medium: activePatients.filter(p => p.riskLevel === 'medium').length,
+      low: activePatients.filter(p => p.riskLevel === 'low').length
+    },
+    byStatus: {
+      active: mockPatients.filter(p => p.status === 'active').length,
+      inactive: mockPatients.filter(p => p.status === 'inactive').length,
+      discharged: mockPatients.filter(p => p.status === 'discharged').length
+    }
+  };
+}
+
+// Get patients overdue for follow-up (no session in last 14 days)
+export function getOverdueFollowUps(): Patient[] {
+  const fourteenDaysAgo = new Date();
+  fourteenDaysAgo.setDate(fourteenDaysAgo.getDate() - 14);
+
+  return mockPatients
+    .filter(p => p.status === 'active')
+    .filter(p => {
+      const lastSession = new Date(p.lastSessionDate);
+      return lastSession < fourteenDaysAgo;
+    })
+    .sort((a, b) => new Date(a.lastSessionDate).getTime() - new Date(b.lastSessionDate).getTime());
+}
 
 // Mock Session History Data - Detailed past sessions
 export const mockSessionHistory: SessionHistory[] = [

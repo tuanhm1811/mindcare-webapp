@@ -4,6 +4,7 @@ import "./globals.css";
 import { AppSidebar } from "@/components/app-sidebar";
 import { AppHeader } from "@/components/app-header";
 import { CrisisButton } from "@/components/crisis-button";
+import { Toaster } from "@/components/ui/sonner";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -46,6 +47,8 @@ export default function RootLayout({
           </div>
           {/* Crisis Emergency Button - Always visible */}
           <CrisisButton />
+          {/* Toast Notifications */}
+          <Toaster />
         </div>
       </body>
     </html>

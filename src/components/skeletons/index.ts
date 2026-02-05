@@ -1,0 +1,6 @@
+export * from "./patient-card-skeleton"
+export * from "./stats-card-skeleton"
+export * from "./appointment-card-skeleton"
+export * from "./table-skeleton"
+export * from "./calendar-skeleton"
+export * from "./dashboard-skeleton"

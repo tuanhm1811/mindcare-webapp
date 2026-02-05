@@ -273,3 +273,191 @@
 .animate-pulse-soft {
   animation: pulse-soft 2s ease-in-out infinite;
 }
+
+/* ============================================
+   MICRO-INTERACTIONS & ANIMATIONS
+   ============================================ */
+
+/* Hover Lift Effect */
+.hover-lift {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.hover-lift:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px -4px rgba(0, 0, 0, 0.1), 0 4px 8px -4px rgba(0, 0, 0, 0.06);
+}
+
+/* Hover Scale Effect */
+.hover-scale {
+  transition: transform 0.15s ease;
+}
+
+.hover-scale:hover {
+  transform: scale(1.02);
+}
+
+/* Press/Active Scale Effect */
+.press-scale:active {
+  transform: scale(0.98);
+}
+
+/* Smooth Transition */
+.transition-smooth {
+  transition: all 0.2s ease;
+}
+
+/* Card Hover with Glow */
+.card-hover-glow {
+  transition: all 0.2s ease;
+}
+
+.card-hover-glow:hover {
+  box-shadow: 0 0 0 1px hsl(var(--primary) / 0.1), 0 8px 24px -8px hsl(var(--primary) / 0.15);
+}
+
+/* Button Loading Spinner */
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin-slow {
+  animation: spin 1.5s linear infinite;
+}
+
+/* Fade In Animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-out;
+}
+
+/* Scale In Animation */
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-scale-in {
+  animation: scaleIn 0.2s ease-out;
+}
+
+/* Slide In from Right */
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.animate-slide-in-right {
+  animation: slideInRight 0.3s ease-out;
+}
+
+/* Slide In from Bottom */
+@keyframes slideInBottom {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-slide-in-bottom {
+  animation: slideInBottom 0.3s ease-out;
+}
+
+/* Bounce on Hover */
+.hover-bounce:hover {
+  animation: bounce 0.5s ease;
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+/* Interactive Card - combines multiple effects */
+.interactive-card {
+  transition: all 0.2s ease;
+}
+
+.interactive-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px -8px rgba(0, 0, 0, 0.1);
+}
+
+.interactive-card:active {
+  transform: translateY(0) scale(0.99);
+}
+
+/* Focus Ring Animation */
+.focus-ring-animated:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px hsl(var(--background)), 0 0 0 4px hsl(var(--primary) / 0.5);
+}
+
+/* Stagger animation for lists */
+.stagger-item {
+  opacity: 0;
+  animation: fadeIn 0.3s ease-out forwards;
+}
+
+.stagger-item:nth-child(1) { animation-delay: 0.05s; }
+.stagger-item:nth-child(2) { animation-delay: 0.1s; }
+.stagger-item:nth-child(3) { animation-delay: 0.15s; }
+.stagger-item:nth-child(4) { animation-delay: 0.2s; }
+.stagger-item:nth-child(5) { animation-delay: 0.25s; }
+.stagger-item:nth-child(6) { animation-delay: 0.3s; }
+
+/* Skeleton Loading Enhancement */
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.skeleton-shimmer {
+  background: linear-gradient(
+    90deg,
+    hsl(var(--muted)) 0%,
+    hsl(var(--muted-foreground) / 0.1) 50%,
+    hsl(var(--muted)) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}

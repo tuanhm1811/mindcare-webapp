@@ -1,6 +1,7 @@
 "use client"
 
 import { use, useState } from "react"
+import { toast } from "sonner"
 import { Badge } from "@/components/ui/badge"
 import { DataDeletionDialog } from "@/components/data-deletion-dialog"
 import { Button } from "@/components/ui/button"
@@ -518,7 +519,9 @@ export default function PatientDetailPage({
         patientId={patient.id}
         onSubmit={(reason, notes) => {
           console.log("Data deletion requested:", { reason, notes, patientId: patient.id })
-          alert("Yêu cầu xóa dữ liệu đã được gửi. Bạn sẽ nhận được email xác nhận trong vòng 24 giờ.")
+          toast.success("Yêu cầu đã được gửi", {
+            description: "Bạn sẽ nhận được email xác nhận trong vòng 24 giờ.",
+          })
         }}
       />
     </div>

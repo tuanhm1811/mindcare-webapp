@@ -1,16 +1,13 @@
 "use client"
 
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from "@/components/ui/label"
-import { ScrollArea } from "@/components/ui/scroll-area"
-import { Shield, Lock, Eye, FileText, CheckCircle } from "lucide-react"
+import { Lock, Eye, Shield, FileText } from "lucide-react"
+import { cn } from "@/lib/utils"
 
 interface ConsentStepProps {
-  onComplete: (consents: ConsentData) => void
-  onBack?: () => void
+  data: ConsentData
+  onChange: (data: ConsentData) => void
 }
 
 export interface ConsentData {
@@ -18,214 +15,135 @@ export interface ConsentData {
   recordingOptIn: boolean
   communicationOptIn: boolean
   termsAccepted: boolean
-  timestamp: Date
+  timestamp: Date | null
 }
 
 const privacyHighlights = [
   {
     icon: Lock,
     title: "Mã hóa dữ liệu",
-    description: "Tất cả dữ liệu được mã hóa end-to-end theo tiêu chuẩn y tế",
+    description: "End-to-end theo tiêu chuẩn y tế",
   },
   {
     icon: Eye,
     title: "Quyền riêng tư",
-    description: "Chỉ bác sĩ điều trị mới có quyền truy cập hồ sơ của bạn",
+    description: "Chỉ bác sĩ điều trị được truy cập",
   },
   {
     icon: Shield,
     title: "Tuân thủ quy định",
-    description: "Hệ thống tuân thủ các quy định về bảo mật thông tin y tế",
+    description: "Bảo mật thông tin y tế",
   },
   {
     icon: FileText,
     title: "Quyền của bạn",
-    description: "Bạn có quyền yêu cầu xem, sửa hoặc xóa dữ liệu bất cứ lúc nào",
+    description: "Xem, sửa, xóa dữ liệu bất cứ lúc nào",
   },
 ]
 
-export function ConsentStep({ onComplete, onBack }: ConsentStepProps) {
-  const [consents, setConsents] = useState({
-    dataCollection: false,
-    recordingOptIn: false,
-    communicationOptIn: false,
-    termsAccepted: false,
-  })
-
-  const canProceed = consents.dataCollection && consents.termsAccepted
-
-  const handleSubmit = () => {
-    if (canProceed) {
-      onComplete({
-        ...consents,
-        timestamp: new Date(),
-      })
-    }
+export function ConsentStep({ data, onChange }: ConsentStepProps) {
+  const updateConsent = (key: keyof Omit<ConsentData, 'timestamp'>, value: boolean) => {
+    onChange({ ...data, [key]: value })
   }
 
   return (
     <div className="space-y-6">
       {/* Privacy Highlights */}
-      <div className="grid grid-cols-2 gap-4">
-        {privacyHighlights.map((item, index) => (
-          <div
-            key={index}
-            className="flex items-start gap-3 p-4 rounded-lg bg-primary/5 border border-primary/10"
-          >
-            <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-              <item.icon className="h-4 w-4 text-primary" />
+      <div className="space-y-4">
+        <h3 className="text-sm font-semibold text-foreground/80 uppercase tracking-wide">
+          Cam kết bảo mật
+        </h3>
+
+        <div className="grid grid-cols-2 gap-3">
+          {privacyHighlights.map((item, index) => (
+            <div
+              key={index}
+              className="flex items-center gap-3 p-3 rounded-xl bg-primary/5 border border-primary/10"
+            >
+              <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+                <item.icon className="h-4 w-4 text-primary" />
+              </div>
+              <div>
+                <p className="font-medium text-sm">{item.title}</p>
+                <p className="text-xs text-muted-foreground">{item.description}</p>
+              </div>
             </div>
-            <div>
-              <p className="font-medium text-sm">{item.title}</p>
-              <p className="text-xs text-muted-foreground">{item.description}</p>
-            </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
 
-      {/* Privacy Policy Summary */}
-      <Card>
-        <CardHeader className="pb-3">
-          <CardTitle className="text-base">Chính sách bảo mật</CardTitle>
-          <CardDescription>
-            Vui lòng đọc kỹ trước khi đồng ý
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <ScrollArea className="h-[200px] rounded-md border p-4">
-            <div className="space-y-4 text-sm text-muted-foreground">
-              <p>
-                <strong>1. Thu thập dữ liệu:</strong> Chúng tôi thu thập thông tin cá nhân,
-                thông tin sức khỏe tâm thần, và lịch sử điều trị của bạn để phục vụ việc
-                chăm sóc sức khỏe.
-              </p>
-              <p>
-                <strong>2. Sử dụng dữ liệu:</strong> Dữ liệu của bạn được sử dụng để:
-              </p>
-              <ul className="list-disc list-inside ml-4 space-y-1">
-                <li>Cung cấp dịch vụ tư vấn và điều trị tâm lý</li>
-                <li>Theo dõi tiến triển điều trị</li>
-                <li>Cải thiện chất lượng dịch vụ</li>
-              </ul>
-              <p>
-                <strong>3. Bảo mật:</strong> Dữ liệu được mã hóa và lưu trữ an toàn theo
-                tiêu chuẩn bảo mật y tế. Chỉ có bác sĩ điều trị mới có quyền truy cập.
-              </p>
-              <p>
-                <strong>4. Quyền của bạn:</strong> Bạn có quyền yêu cầu xem, chỉnh sửa,
-                hoặc xóa dữ liệu cá nhân của mình bất cứ lúc nào.
-              </p>
-              <p>
-                <strong>5. Lưu trữ:</strong> Dữ liệu được lưu trữ theo quy định pháp luật
-                về hồ sơ bệnh án (tối thiểu 10 năm sau khi kết thúc điều trị).
-              </p>
-              <p>
-                <strong>6. Chia sẻ dữ liệu:</strong> Chúng tôi không chia sẻ dữ liệu của bạn
-                với bên thứ ba trừ khi có yêu cầu pháp lý hoặc được sự đồng ý của bạn.
-              </p>
-            </div>
-          </ScrollArea>
-        </CardContent>
-      </Card>
+      {/* Consent Options */}
+      <div className="space-y-4">
+        <h3 className="text-sm font-semibold text-foreground/80 uppercase tracking-wide">
+          Đồng ý điều khoản
+        </h3>
 
-      {/* Consent Checkboxes */}
-      <Card>
-        <CardHeader className="pb-3">
-          <CardTitle className="text-base">Đồng ý điều khoản</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
+        <div className="space-y-3">
           {/* Required: Data Collection */}
-          <div className="flex items-start gap-3 p-3 rounded-lg border border-primary/20 bg-primary/5">
+          <div
+            className={cn(
+              "flex items-start gap-4 p-4 rounded-xl border-2 transition-all cursor-pointer",
+              data.dataCollection
+                ? "border-primary bg-primary/5"
+                : "border-muted-foreground/20 hover:border-muted-foreground/40"
+            )}
+            onClick={() => updateConsent("dataCollection", !data.dataCollection)}
+          >
             <Checkbox
               id="dataCollection"
-              checked={consents.dataCollection}
-              onCheckedChange={(checked) =>
-                setConsents((prev) => ({ ...prev, dataCollection: checked as boolean }))
-              }
+              checked={data.dataCollection}
+              onCheckedChange={(checked) => updateConsent("dataCollection", checked as boolean)}
+              className="mt-0.5"
             />
             <div className="flex-1">
               <Label
                 htmlFor="dataCollection"
-                className="text-sm font-medium cursor-pointer"
+                className="text-sm font-medium cursor-pointer flex items-center gap-2"
               >
-                Thu thập và xử lý dữ liệu *
+                Thu thập và xử lý dữ liệu
+                <span className="text-[10px] px-2 py-0.5 rounded-full bg-destructive/10 text-destructive font-semibold">
+                  Bắt buộc
+                </span>
               </Label>
               <p className="text-xs text-muted-foreground mt-1">
-                Tôi đồng ý cho MindCare thu thập và xử lý dữ liệu sức khỏe của tôi
-                để phục vụ việc chăm sóc và điều trị.
-              </p>
-            </div>
-          </div>
-
-          {/* Optional: Recording */}
-          <div className="flex items-start gap-3 p-3 rounded-lg border">
-            <Checkbox
-              id="recordingOptIn"
-              checked={consents.recordingOptIn}
-              onCheckedChange={(checked) =>
-                setConsents((prev) => ({ ...prev, recordingOptIn: checked as boolean }))
-              }
-            />
-            <div className="flex-1">
-              <Label
-                htmlFor="recordingOptIn"
-                className="text-sm font-medium cursor-pointer"
-              >
-                Ghi âm buổi tư vấn (tùy chọn)
-              </Label>
-              <p className="text-xs text-muted-foreground mt-1">
-                Tôi đồng ý cho phép ghi âm các buổi tư vấn để hỗ trợ việc ghi chú
-                và theo dõi điều trị. Bạn có thể từ chối từng buổi cụ thể.
-              </p>
-            </div>
-          </div>
-
-          {/* Optional: Communication */}
-          <div className="flex items-start gap-3 p-3 rounded-lg border">
-            <Checkbox
-              id="communicationOptIn"
-              checked={consents.communicationOptIn}
-              onCheckedChange={(checked) =>
-                setConsents((prev) => ({ ...prev, communicationOptIn: checked as boolean }))
-              }
-            />
-            <div className="flex-1">
-              <Label
-                htmlFor="communicationOptIn"
-                className="text-sm font-medium cursor-pointer"
-              >
-                Nhận thông báo (tùy chọn)
-              </Label>
-              <p className="text-xs text-muted-foreground mt-1">
-                Tôi đồng ý nhận thông báo nhắc nhở lịch hẹn và các thông tin chăm sóc
-                sức khỏe qua email/SMS.
+                Đồng ý cho MindCare thu thập và xử lý dữ liệu sức khỏe để phục vụ việc chăm sóc và điều trị.
               </p>
             </div>
           </div>
 
           {/* Required: Terms */}
-          <div className="flex items-start gap-3 p-3 rounded-lg border border-primary/20 bg-primary/5">
+          <div
+            className={cn(
+              "flex items-start gap-4 p-4 rounded-xl border-2 transition-all cursor-pointer",
+              data.termsAccepted
+                ? "border-primary bg-primary/5"
+                : "border-muted-foreground/20 hover:border-muted-foreground/40"
+            )}
+            onClick={() => updateConsent("termsAccepted", !data.termsAccepted)}
+          >
             <Checkbox
               id="termsAccepted"
-              checked={consents.termsAccepted}
-              onCheckedChange={(checked) =>
-                setConsents((prev) => ({ ...prev, termsAccepted: checked as boolean }))
-              }
+              checked={data.termsAccepted}
+              onCheckedChange={(checked) => updateConsent("termsAccepted", checked as boolean)}
+              className="mt-0.5"
             />
             <div className="flex-1">
               <Label
                 htmlFor="termsAccepted"
-                className="text-sm font-medium cursor-pointer"
+                className="text-sm font-medium cursor-pointer flex items-center gap-2"
               >
-                Chấp nhận điều khoản sử dụng *
+                Chấp nhận điều khoản sử dụng
+                <span className="text-[10px] px-2 py-0.5 rounded-full bg-destructive/10 text-destructive font-semibold">
+                  Bắt buộc
+                </span>
               </Label>
               <p className="text-xs text-muted-foreground mt-1">
-                Tôi đã đọc và chấp nhận{" "}
-                <a href="#" className="text-primary underline">
+                Đã đọc và chấp nhận{" "}
+                <a href="#" className="text-primary underline" onClick={(e) => e.stopPropagation()}>
                   Điều khoản sử dụng
                 </a>{" "}
                 và{" "}
-                <a href="#" className="text-primary underline">
+                <a href="#" className="text-primary underline" onClick={(e) => e.stopPropagation()}>
                   Chính sách bảo mật
                 </a>
                 .
@@ -233,27 +151,70 @@ export function ConsentStep({ onComplete, onBack }: ConsentStepProps) {
             </div>
           </div>
 
-          <p className="text-xs text-muted-foreground">
-            * Bắt buộc để tiếp tục sử dụng dịch vụ
-          </p>
-        </CardContent>
-      </Card>
+          {/* Optional: Recording */}
+          <div
+            className={cn(
+              "flex items-start gap-4 p-4 rounded-xl border-2 transition-all cursor-pointer",
+              data.recordingOptIn
+                ? "border-primary bg-primary/5"
+                : "border-muted-foreground/20 hover:border-muted-foreground/40"
+            )}
+            onClick={() => updateConsent("recordingOptIn", !data.recordingOptIn)}
+          >
+            <Checkbox
+              id="recordingOptIn"
+              checked={data.recordingOptIn}
+              onCheckedChange={(checked) => updateConsent("recordingOptIn", checked as boolean)}
+              className="mt-0.5"
+            />
+            <div className="flex-1">
+              <Label
+                htmlFor="recordingOptIn"
+                className="text-sm font-medium cursor-pointer flex items-center gap-2"
+              >
+                Ghi âm buổi tư vấn
+                <span className="text-[10px] px-2 py-0.5 rounded-full bg-muted text-muted-foreground font-medium">
+                  Tùy chọn
+                </span>
+              </Label>
+              <p className="text-xs text-muted-foreground mt-1">
+                Cho phép ghi âm các buổi tư vấn để hỗ trợ việc ghi chú. Bạn có thể từ chối từng buổi cụ thể.
+              </p>
+            </div>
+          </div>
 
-      {/* Actions */}
-      <div className="flex justify-between">
-        {onBack && (
-          <Button variant="outline" onClick={onBack}>
-            Quay lại
-          </Button>
-        )}
-        <Button
-          onClick={handleSubmit}
-          disabled={!canProceed}
-          className={onBack ? "" : "ml-auto"}
-        >
-          <CheckCircle className="mr-2 h-4 w-4" />
-          Xác nhận và tiếp tục
-        </Button>
+          {/* Optional: Communication */}
+          <div
+            className={cn(
+              "flex items-start gap-4 p-4 rounded-xl border-2 transition-all cursor-pointer",
+              data.communicationOptIn
+                ? "border-primary bg-primary/5"
+                : "border-muted-foreground/20 hover:border-muted-foreground/40"
+            )}
+            onClick={() => updateConsent("communicationOptIn", !data.communicationOptIn)}
+          >
+            <Checkbox
+              id="communicationOptIn"
+              checked={data.communicationOptIn}
+              onCheckedChange={(checked) => updateConsent("communicationOptIn", checked as boolean)}
+              className="mt-0.5"
+            />
+            <div className="flex-1">
+              <Label
+                htmlFor="communicationOptIn"
+                className="text-sm font-medium cursor-pointer flex items-center gap-2"
+              >
+                Nhận thông báo
+                <span className="text-[10px] px-2 py-0.5 rounded-full bg-muted text-muted-foreground font-medium">
+                  Tùy chọn
+                </span>
+              </Label>
+              <p className="text-xs text-muted-foreground mt-1">
+                Nhận thông báo nhắc nhở lịch hẹn và thông tin chăm sóc sức khỏe qua email/SMS.
+              </p>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   )

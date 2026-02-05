@@ -5,28 +5,59 @@ import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Progress } from "@/components/ui/progress"
 import {
-  Users,
-  Calendar,
-  FileText,
   AlertTriangle,
   ChevronRight,
   TrendingUp,
   TrendingDown,
   Phone,
-  Play,
-  ChevronLeft,
+  FileText,
+  ClipboardCheck,
+  FlaskConical,
+  PhoneCall,
+  Calendar,
+  Clock,
+  CheckCircle2,
+  Circle,
 } from "lucide-react"
 import Link from "next/link"
-import { dashboardStats, getTodaySchedule, mockPatients, mockSessions, currentClinician } from "@/lib/mock-data"
-
-// Mini calendar data
-const weekDays = ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sat', 'Su']
-const currentDate = new Date()
-const currentDay = currentDate.getDate()
+import {
+  dashboardStats,
+  getTodaySchedule,
+  mockPatients,
+  currentClinician,
+  mockActionItems,
+  mockClinicalOutcomes,
+  getCaseloadSummary,
+  getOverdueFollowUps,
+  type ActionItem
+} from "@/lib/mock-data"
 
 export default function DashboardPage() {
   const todaySchedule = getTodaySchedule()
   const highRiskPatients = mockPatients.filter(p => p.riskLevel === 'high')
+  const caseloadSummary = getCaseloadSummary()
+  const overdueFollowUps = getOverdueFollowUps()
+
+  // Action item icon based on type
+  const getActionIcon = (type: ActionItem['type']) => {
+    switch (type) {
+      case 'note_due': return <FileText className="h-4 w-4" />
+      case 'assessment_due': return <ClipboardCheck className="h-4 w-4" />
+      case 'treatment_plan': return <Calendar className="h-4 w-4" />
+      case 'lab_result': return <FlaskConical className="h-4 w-4" />
+      case 'follow_up': return <PhoneCall className="h-4 w-4" />
+      default: return <Circle className="h-4 w-4" />
+    }
+  }
+
+  // Priority color
+  const getPriorityColor = (priority: ActionItem['priority']) => {
+    switch (priority) {
+      case 'high': return 'text-red-500 bg-red-50'
+      case 'medium': return 'text-amber-500 bg-amber-50'
+      case 'low': return 'text-green-500 bg-green-50'
+    }
+  }
 
   return (
     <div className="p-6 space-y-6">
@@ -100,38 +131,68 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {/* Upcoming - Mini Calendar */}
+        {/* Caseload Summary */}
         <div className="stats-card">
           <div className="flex items-center justify-between mb-3">
-            <h3 className="text-sm font-medium text-muted-foreground">Upcoming</h3>
-            <div className="flex items-center gap-1">
-              <Button variant="ghost" size="icon" className="h-6 w-6">
-                <ChevronLeft className="h-4 w-4" />
-              </Button>
-              <Button variant="ghost" size="icon" className="h-6 w-6">
-                <ChevronRight className="h-4 w-4" />
-              </Button>
+            <h3 className="text-sm font-medium text-muted-foreground">Caseload Summary</h3>
+          </div>
+          <div className="space-y-3">
+            {/* Risk distribution */}
+            <div>
+              <div className="flex items-center justify-between text-xs mb-1.5">
+                <span className="text-muted-foreground">Phân bố Risk Level</span>
+                <span className="font-medium">{caseloadSummary.total} BN</span>
+              </div>
+              <div className="flex gap-1 h-3 rounded-full overflow-hidden">
+                <div
+                  className="bg-red-400 transition-all"
+                  style={{ width: `${(caseloadSummary.byRisk.high / caseloadSummary.total) * 100}%` }}
+                  title={`High: ${caseloadSummary.byRisk.high}`}
+                />
+                <div
+                  className="bg-amber-400 transition-all"
+                  style={{ width: `${(caseloadSummary.byRisk.medium / caseloadSummary.total) * 100}%` }}
+                  title={`Medium: ${caseloadSummary.byRisk.medium}`}
+                />
+                <div
+                  className="bg-green-400 transition-all"
+                  style={{ width: `${(caseloadSummary.byRisk.low / caseloadSummary.total) * 100}%` }}
+                  title={`Low: ${caseloadSummary.byRisk.low}`}
+                />
+              </div>
             </div>
-          </div>
-          <div className="grid grid-cols-7 gap-1 text-center text-xs mb-2">
-            {weekDays.map((day) => (
-              <div key={day} className="text-muted-foreground font-medium">
-                {day}
+            {/* Risk legend */}
+            <div className="flex items-center justify-between text-xs">
+              <div className="flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full bg-red-400" />
+                <span className="text-muted-foreground">Cao ({caseloadSummary.byRisk.high})</span>
               </div>
-            ))}
-          </div>
-          <div className="grid grid-cols-7 gap-1 text-center text-sm">
-            {[21, 22, 23, 24, 25, 26, 27].map((day) => (
-              <div
-                key={day}
-                className={`py-1 rounded-md ${day === 22
-                    ? 'bg-primary text-primary-foreground font-medium'
-                    : 'text-muted-foreground hover:bg-muted cursor-pointer'
-                  }`}
-              >
-                {day}
+              <div className="flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full bg-amber-400" />
+                <span className="text-muted-foreground">TB ({caseloadSummary.byRisk.medium})</span>
               </div>
-            ))}
+              <div className="flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full bg-green-400" />
+                <span className="text-muted-foreground">Thấp ({caseloadSummary.byRisk.low})</span>
+              </div>
+            </div>
+            {/* Status summary */}
+            <div className="pt-2 border-t border-border/50">
+              <div className="grid grid-cols-3 gap-2 text-center text-xs">
+                <div>
+                  <p className="font-semibold text-lg">{caseloadSummary.byStatus.active}</p>
+                  <p className="text-muted-foreground">Đang ĐT</p>
+                </div>
+                <div>
+                  <p className="font-semibold text-lg">{caseloadSummary.byStatus.inactive}</p>
+                  <p className="text-muted-foreground">Tạm ngưng</p>
+                </div>
+                <div>
+                  <p className="font-semibold text-lg">{caseloadSummary.byStatus.discharged}</p>
+                  <p className="text-muted-foreground">Kết thúc</p>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -197,33 +258,83 @@ export default function DashboardPage() {
             </div>
           </div>
 
-          {/* Progress Chart */}
+          {/* Clinical Outcomes - Assessment Trends */}
           <div className="glass-card rounded-2xl p-5">
             <div className="flex items-center justify-between mb-4">
               <div>
-                <h2 className="text-lg font-semibold">Patient Progress Overview</h2>
-                <p className="text-sm text-muted-foreground">Based on assessment scores over time</p>
+                <h2 className="text-lg font-semibold">Clinical Outcomes</h2>
+                <p className="text-sm text-muted-foreground">Assessment score trends (PHQ-9, GAD-7, PCL-5)</p>
               </div>
-              <div className="flex gap-1">
-                <Button variant="outline" size="sm" className="rounded-full text-xs">Week</Button>
-                <Button variant="ghost" size="sm" className="rounded-full text-xs">Month</Button>
-                <Button variant="ghost" size="sm" className="rounded-full text-xs">Year</Button>
-              </div>
+              <Link href="/patients">
+                <Button variant="outline" size="sm" className="rounded-full text-xs">
+                  View all
+                  <ChevronRight className="ml-1 h-3 w-3" />
+                </Button>
+              </Link>
             </div>
 
-            {/* Simple bar chart visualization */}
-            <div className="flex items-end gap-3 h-40 pt-4">
-              {[45, 60, 55, 70, 65, 80, 75].map((value, index) => (
-                <div key={index} className="flex-1 flex flex-col items-center gap-2">
-                  <div
-                    className="w-full rounded-t-lg bg-gradient-to-t from-primary/60 to-primary/30 transition-all duration-300 hover:from-primary/80 hover:to-primary/50"
-                    style={{ height: `${value}%` }}
-                  />
-                  <span className="text-xs text-muted-foreground">
-                    {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'][index]}
-                  </span>
-                </div>
-              ))}
+            {/* Assessment trends list */}
+            <div className="space-y-4">
+              {mockClinicalOutcomes.slice(0, 4).map((outcome) => {
+                const latestScore = outcome.scores[outcome.scores.length - 1]
+                const previousScore = outcome.scores[outcome.scores.length - 2]
+                const percentChange = previousScore
+                  ? Math.round(((latestScore.score - previousScore.score) / previousScore.score) * 100)
+                  : 0
+
+                return (
+                  <div key={outcome.patientId} className="flex items-center gap-3">
+                    <Avatar className="h-9 w-9">
+                      <AvatarFallback className="bg-primary/10 text-primary text-sm">
+                        {outcome.patientName.split(' ').slice(-2).map(n => n[0]).join('')}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <p className="font-medium text-sm truncate">{outcome.patientName}</p>
+                        <Badge variant="outline" className="text-[10px] px-1.5 py-0">
+                          {outcome.assessmentType}
+                        </Badge>
+                      </div>
+                      {/* Mini sparkline visualization */}
+                      <div className="flex items-center gap-2 mt-1">
+                        <div className="flex items-end gap-0.5 h-4">
+                          {outcome.scores.map((s, i) => (
+                            <div
+                              key={i}
+                              className={`w-3 rounded-sm transition-all ${
+                                outcome.trend === 'improving' ? 'bg-green-400' :
+                                outcome.trend === 'declining' ? 'bg-red-400' : 'bg-amber-400'
+                              }`}
+                              style={{ height: `${(s.score / s.maxScore) * 100}%`, opacity: 0.4 + (i * 0.3) }}
+                            />
+                          ))}
+                        </div>
+                        <span className="text-xs text-muted-foreground">
+                          {latestScore.score}/{latestScore.maxScore}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <div className={`flex items-center gap-1 text-sm font-medium ${
+                        outcome.trend === 'improving' ? 'text-green-600' :
+                        outcome.trend === 'declining' ? 'text-red-600' : 'text-amber-600'
+                      }`}>
+                        {outcome.trend === 'improving' ? (
+                          <TrendingDown className="h-4 w-4" />
+                        ) : outcome.trend === 'declining' ? (
+                          <TrendingUp className="h-4 w-4" />
+                        ) : null}
+                        {percentChange !== 0 && `${Math.abs(percentChange)}%`}
+                      </div>
+                      <p className="text-[10px] text-muted-foreground">
+                        {outcome.trend === 'improving' ? 'Cải thiện' :
+                         outcome.trend === 'declining' ? 'Xấu đi' : 'Ổn định'}
+                      </p>
+                    </div>
+                  </div>
+                )
+              })}
             </div>
           </div>
         </div>
@@ -271,68 +382,102 @@ export default function DashboardPage() {
             </div>
           )}
 
-          {/* Upcoming Appointments List */}
+          {/* Overdue Follow-ups */}
           <div className="glass-card rounded-2xl p-5">
-            <h3 className="font-semibold mb-4">Upcoming Sessions</h3>
-            <div className="space-y-3">
-              {mockSessions.slice(0, 4).map((session) => {
-                const patient = mockPatients.find(p => p.id === session.patientId)
-                return (
-                  <div key={session.id} className="flex items-center gap-3">
-                    <Avatar className="h-9 w-9">
-                      <AvatarFallback className="bg-primary/10 text-primary text-sm">
-                        {patient?.lastName.charAt(0)}{patient?.firstName.charAt(0)}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="flex-1 min-w-0">
-                      <p className="font-medium text-sm truncate">{session.patientName}</p>
-                      <p className="text-xs text-muted-foreground">
-                        {patient?.diagnoses[0]?.name.split(' ').slice(0, 2).join(' ')}
-                      </p>
-                    </div>
-                    <div className="text-right">
-                      <p className="text-sm font-medium">
-                        {new Date(session.scheduledAt).toLocaleTimeString('vi-VN', {
-                          hour: '2-digit',
-                          minute: '2-digit',
-                        })}
-                      </p>
-                      <p className="text-xs text-muted-foreground">Today</p>
-                    </div>
-                  </div>
-                )
-              })}
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="font-semibold">Cần theo dõi</h3>
+              {overdueFollowUps.length > 0 && (
+                <Badge variant="secondary" className="text-xs bg-amber-100 text-amber-700">
+                  {overdueFollowUps.length} BN
+                </Badge>
+              )}
             </div>
-            <Button className="w-full mt-4 rounded-full">
-              Schedule a new consultation
-            </Button>
+            {overdueFollowUps.length > 0 ? (
+              <div className="space-y-3">
+                {overdueFollowUps.slice(0, 4).map((patient) => {
+                  const daysSinceLastSession = Math.floor(
+                    (new Date().getTime() - new Date(patient.lastSessionDate).getTime()) / (1000 * 60 * 60 * 24)
+                  )
+                  return (
+                    <Link
+                      key={patient.id}
+                      href={`/patients/${patient.id}`}
+                      className="flex items-center gap-3 p-2 -mx-2 rounded-lg hover:bg-muted/50 transition-colors"
+                    >
+                      <Avatar className="h-9 w-9">
+                        <AvatarFallback className={`text-sm ${
+                          patient.riskLevel === 'high' ? 'bg-red-100 text-red-700' :
+                          patient.riskLevel === 'medium' ? 'bg-amber-100 text-amber-700' :
+                          'bg-primary/10 text-primary'
+                        }`}>
+                          {patient.lastName.charAt(0)}{patient.firstName.charAt(0)}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-medium text-sm truncate">
+                          {patient.lastName} {patient.firstName}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          {patient.diagnoses[0]?.name.split(' ').slice(0, 3).join(' ')}
+                        </p>
+                      </div>
+                      <div className="text-right">
+                        <div className="flex items-center gap-1 text-xs text-amber-600">
+                          <Clock className="h-3 w-3" />
+                          {daysSinceLastSession} ngày
+                        </div>
+                        <p className="text-[10px] text-muted-foreground">chưa khám</p>
+                      </div>
+                    </Link>
+                  )
+                })}
+              </div>
+            ) : (
+              <div className="text-center py-4 text-muted-foreground text-sm">
+                <CheckCircle2 className="h-8 w-8 mx-auto mb-2 text-green-500" />
+                <p>Tất cả bệnh nhân đã được theo dõi</p>
+              </div>
+            )}
+            <Link href="/schedule">
+              <Button className="w-full mt-4 rounded-full">
+                Đặt lịch hẹn mới
+              </Button>
+            </Link>
           </div>
 
-          {/* Recent Session Records */}
+          {/* Action Items / Tasks */}
           <div className="glass-card rounded-2xl p-5">
-            <h3 className="font-semibold mb-1">Records of recent sessions</h3>
+            <div className="flex items-center justify-between mb-1">
+              <h3 className="font-semibold">Action Items</h3>
+              <Badge variant="secondary" className="text-xs">
+                {mockActionItems.filter(i => i.priority === 'high').length} urgent
+              </Badge>
+            </div>
             <p className="text-sm text-muted-foreground mb-4">
-              View recordings for review
+              Công việc cần hoàn thành
             </p>
-            <div className="space-y-3">
-              {[
-                { name: 'Protecting personal space', doctor: 'Dr. McCoy', duration: '45min' },
-                { name: 'Respectful relationship s3', doctor: 'Darlene Robertson', duration: '1h 7min' },
-                { name: 'Respectful relationship s2', doctor: 'Darlene Robertson', duration: '58 min' },
-              ].map((record, index) => (
-                <div key={index} className="flex items-center gap-3 p-2 rounded-lg hover:bg-muted/50 transition-colors cursor-pointer">
-                  <div className="flex items-center justify-center w-9 h-9 rounded-full bg-primary/10">
-                    <Play className="h-4 w-4 text-primary ml-0.5" />
+            <div className="space-y-2">
+              {mockActionItems.slice(0, 5).map((item) => (
+                <div
+                  key={item.id}
+                  className="flex items-start gap-3 p-2 rounded-lg hover:bg-muted/50 transition-colors cursor-pointer group"
+                >
+                  <div className={`flex items-center justify-center w-8 h-8 rounded-full shrink-0 ${getPriorityColor(item.priority)}`}>
+                    {getActionIcon(item.type)}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="font-medium text-sm truncate">{record.name}</p>
-                    <p className="text-xs text-muted-foreground">
-                      {record.doctor} · {record.duration}
+                    <p className="font-medium text-sm">{item.title}</p>
+                    <p className="text-xs text-muted-foreground truncate">
+                      {item.description}
                     </p>
                   </div>
+                  <ChevronRight className="h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity mt-1" />
                 </div>
               ))}
             </div>
+            <Button variant="outline" className="w-full mt-4 rounded-full">
+              Xem tất cả tasks
+            </Button>
           </div>
         </div>
       </div>

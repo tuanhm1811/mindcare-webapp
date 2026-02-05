@@ -1,6 +1,7 @@
 "use client"
 
 import { use, useState, useMemo } from "react"
+import { toast } from "sonner"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { useUnsavedChanges } from "@/hooks/use-unsaved-changes"
 import { UnsavedChangesDialog } from "@/components/unsaved-changes-dialog"
@@ -181,7 +182,9 @@ export default function PostSessionPage({
   }
 
   const handleSave = () => {
-    alert("Đã lưu ghi chú thành công!")
+    toast.success("Đã lưu ghi chú thành công!", {
+      description: "Bạn sẽ được chuyển về trang chủ.",
+    })
     router.push("/")
   }
 
