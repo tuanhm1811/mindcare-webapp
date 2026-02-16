@@ -48,12 +48,6 @@ const FEATURES = [
     mockup: "progress-dashboard",
   },
   {
-    tag: "Evidence-based, luôn cập nhật",
-    title: "AI Treatment Suggestions",
-    desc: "Gợi ý can thiệp dựa trên tài liệu được bác sĩ cung cấp. Không thay thế chuyên môn — mà hỗ trợ ra quyết định lâm sàng tốt hơn.",
-    mockup: "treatment-suggestions",
-  },
-  {
     tag: "Giảm 60% no-show",
     title: "Smart Scheduling",
     desc: "Lịch hẹn thông minh với nhắc nhở tự động. Kéo thả để đổi lịch. Tổng quan ngày/tuần giúp bạn cân bằng caseload và tránh kiệt sức.",
@@ -64,6 +58,12 @@ const FEATURES = [
     title: "Secure Telehealth",
     desc: "Video call mã hóa đầu-cuối, tích hợp ngay trong nền tảng. Ghi âm với consent. Không cần Zoom riêng, Google Meet riêng — tất cả trong một nơi.",
     mockup: "telehealth",
+  },
+  {
+    tag: "Evidence-based, luôn cập nhật",
+    title: "AI Treatment Suggestions",
+    desc: "Gợi ý can thiệp dựa trên tài liệu được bác sĩ cung cấp. Không thay thế chuyên môn — mà hỗ trợ ra quyết định lâm sàng tốt hơn.",
+    mockup: "treatment-suggestions",
   },
 ] as const;
 
@@ -792,10 +792,9 @@ const SOAP_SECTIONS = [
 ];
 
 function SessionNotesMockup() {
-  const [step, setStep] = useState(0); // 0..TRANSCRIPT_LINES.length = transcript phase, then SOAP phase
-  const totalTranscript = TRANSCRIPT_LINES.length;
   const totalSoap = SOAP_SECTIONS.length;
-  const totalSteps = totalTranscript + 1 + totalSoap + 1; // transcript lines + "analyzing" + soap sections + hold
+  const totalSteps = 1 + totalSoap + 1; // "analyzing" + soap sections + hold
+  const [step, setStep] = useState(0);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -804,9 +803,8 @@ function SessionNotesMockup() {
     return () => clearInterval(interval);
   }, [totalSteps]);
 
-  const transcriptVisible = Math.min(step, totalTranscript);
-  const isAnalyzing = step === totalTranscript;
-  const soapVisible = step > totalTranscript ? Math.min(step - totalTranscript - 1, totalSoap) : 0;
+  const isAnalyzing = step === 0;
+  const soapVisible = step > 0 ? Math.min(step, totalSoap) : 0;
 
   return (
     <div className="flex gap-2 h-full" style={{ minHeight: 260 }}>
@@ -818,14 +816,7 @@ function SessionNotesMockup() {
         </div>
         <div className="flex-1 space-y-1.5 overflow-hidden">
           {TRANSCRIPT_LINES.map((line, i) => (
-            <div
-              key={i}
-              className="transition-all duration-500"
-              style={{
-                opacity: i < transcriptVisible ? 1 : 0,
-                transform: `translateY(${i < transcriptVisible ? 0 : 10}px)`,
-              }}
-            >
+            <div key={i}>
               <div className={`text-[10px] font-semibold mb-0.5 ${line.role === "therapist" ? "text-teal-600" : "text-stone-500"}`}>
                 {line.role === "therapist" ? "BS. Minh" : "Thân chủ"}
               </div>
