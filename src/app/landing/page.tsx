@@ -20,7 +20,7 @@ const PAIN_POINTS = [
   {
     icon: "chart",
     title: "Khó theo dõi tiến trình hệ thống",
-    desc: "PHQ-9, GAD-7, nhật ký cảm xúc — dữ liệu nằm rải rác trong sổ tay, Excel, và trí nhớ. Bạn biết thân chủ tiến triển, nhưng khó chứng minh bằng con số.",
+    desc: "Dữ liệu nằm rải rác trong sổ tay, Excel, và trí nhớ. Bạn biết thân chủ tiến triển, nhưng khó chứng minh bằng con số và chia sẻ với họ.",
   },
   {
     icon: "puzzle",
@@ -36,7 +36,7 @@ const PAIN_POINTS = [
 
 const FEATURES = [
   {
-    tag: "Tiết kiệm 2 giờ mỗi ngày",
+    tag: "Tiết kiệm 3+ giờ mỗi ngày",
     title: "AI Session Notes",
     desc: "Kết thúc phiên trị liệu, ghi chú lập tức sẵn sàng. AI lắng nghe, tóm tắt, và tạo bản tóm tắt nháp — bạn chỉ cần review và phê duyệt. Giảm 80% thời gian ghi chép.",
     mockup: "session-notes",
@@ -1097,6 +1097,151 @@ function ScheduleMockup() {
   );
 }
 
+function TelehealthMockup() {
+  const [phase, setPhase] = useState(0); // 0 = calling, 1 = summary
+  const [timer, setTimer] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => setPhase((p) => (p === 0 ? 1 : 0)), 4000);
+    return () => clearInterval(interval);
+  }, []);
+
+  // Running timer for call phase
+  useEffect(() => {
+    if (phase === 0) {
+      setTimer(0);
+      const t = setInterval(() => setTimer((s) => s + 1), 1000);
+      return () => clearInterval(t);
+    }
+  }, [phase]);
+
+  const mins = Math.floor(timer / 60).toString().padStart(2, "0");
+  const secs = (timer % 60).toString().padStart(2, "0");
+
+  return (
+    <div className="space-y-3 relative">
+      {/* Phase 0: Video call in progress */}
+      <div
+        className="transition-all duration-700"
+        style={{ opacity: phase === 0 ? 1 : 0, transform: `translateY(${phase === 0 ? 0 : -12}px)`, position: phase === 0 ? "relative" : "absolute", top: 0, left: 0, right: 0 }}
+      >
+        <div className="relative bg-stone-800 rounded-xl overflow-hidden" style={{ height: 140 }}>
+          <div className="absolute inset-0 bg-gradient-to-br from-stone-700 to-stone-900" />
+          {/* Caller avatar with ripple */}
+          <div className="relative flex flex-col items-center justify-center h-full gap-2">
+            <div className="relative">
+              <div className="absolute inset-0 rounded-full bg-teal-500/20 animate-ping" style={{ animationDuration: "2s" }} />
+              <div className="absolute -inset-2 rounded-full bg-teal-500/10 animate-ping" style={{ animationDuration: "2.5s", animationDelay: "0.3s" }} />
+              <div className="relative w-12 h-12 rounded-full bg-gradient-to-br from-teal-500 to-teal-700 flex items-center justify-center shadow-lg shadow-teal-500/30">
+                <span className="text-white text-lg font-bold">TC</span>
+              </div>
+            </div>
+            <span className="text-teal-300 text-[11px] font-medium">Nguyễn Văn A</span>
+            <div className="flex items-center gap-1.5">
+              <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+              <span className="text-emerald-400 text-[10px]">{mins}:{secs}</span>
+            </div>
+          </div>
+          {/* PiP */}
+          <div className="absolute bottom-2 right-2 w-16 h-12 rounded-lg bg-gradient-to-br from-stone-500 to-stone-700 border-2 border-stone-400/50 flex items-center justify-center shadow-md">
+            <span className="text-stone-200 text-[9px] font-medium">BS. Minh</span>
+          </div>
+          {/* REC badge */}
+          <div className="absolute top-2 left-2 flex items-center gap-1 bg-red-500/90 px-2 py-0.5 rounded-full backdrop-blur-sm">
+            <div className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
+            <span className="text-white text-[9px] font-semibold">REC</span>
+          </div>
+          {/* Timer badge */}
+          <div className="absolute top-2 right-2 bg-black/40 backdrop-blur-sm px-2 py-0.5 rounded-full">
+            <span className="text-white/80 text-[9px] font-mono">{mins}:{secs}</span>
+          </div>
+        </div>
+        {/* Controls */}
+        <div className="flex items-center justify-center gap-2.5 mt-2.5">
+          {[
+            { label: "Mic", active: true },
+            { label: "Camera", active: true },
+            { label: "Share", active: false },
+            { label: "Record", active: true },
+          ].map((btn) => (
+            <div
+              key={btn.label}
+              className={`w-8 h-8 rounded-full flex items-center justify-center text-[8px] font-medium ${btn.active ? "bg-stone-200 text-stone-600" : "bg-stone-100 text-stone-400"}`}
+            >
+              {btn.label}
+            </div>
+          ))}
+          <div className="w-8 h-8 rounded-full bg-red-500 flex items-center justify-center shadow-sm shadow-red-500/30">
+            <span className="text-[8px] text-white font-bold">End</span>
+          </div>
+        </div>
+        {/* Security bar */}
+        <div className="flex items-center justify-center gap-3 mt-2">
+          <div className="flex items-center gap-1 text-[9px] text-emerald-600">
+            <Icon name="lock" size={9} />
+            <span>E2E Encrypted</span>
+          </div>
+          <div className="w-px h-3 bg-stone-200" />
+          <div className="flex items-center gap-1 text-[9px] text-emerald-600">
+            <Icon name="shield" size={9} />
+            <span>HIPAA-ready</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Phase 1: Post-session summary */}
+      <div
+        className="transition-all duration-700"
+        style={{ opacity: phase === 1 ? 1 : 0, transform: `translateY(${phase === 1 ? 0 : 12}px)`, position: phase === 1 ? "relative" : "absolute", top: 0, left: 0, right: 0 }}
+      >
+        <div className="rounded-xl border border-stone-200 bg-white overflow-hidden">
+          {/* Header */}
+          <div className="bg-gradient-to-r from-teal-600 to-teal-700 px-4 py-3 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Icon name="check" size={14} className="text-white" />
+              <span className="text-white text-xs font-semibold">Phiên hoàn tất</span>
+            </div>
+            <span className="text-teal-200 text-[10px]">45:23</span>
+          </div>
+          {/* Summary items */}
+          <div className="p-3 space-y-2.5">
+            {[
+              { icon: "user" as const, label: "Thân chủ", value: "Nguyễn Văn A", color: "text-stone-700" },
+              { icon: "mic" as const, label: "Ghi âm", value: "Đã lưu (có consent)", color: "text-emerald-600" },
+              { icon: "sparkles" as const, label: "AI Note", value: "Đang tạo SOAP note...", color: "text-teal-600" },
+            ].map((item, i) => (
+              <div key={i} className="flex items-center gap-2.5">
+                <div className="w-7 h-7 rounded-lg bg-stone-100 flex items-center justify-center shrink-0">
+                  <Icon name={item.icon} size={12} className="text-stone-500" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="text-[9px] text-stone-400">{item.label}</div>
+                  <div className={`text-[11px] font-medium ${item.color} ${item.icon === "sparkles" ? "animate-pulse" : ""}`}>{item.value}</div>
+                </div>
+                {item.icon === "mic" && (
+                  <Icon name="check" size={12} className="text-emerald-500" />
+                )}
+              </div>
+            ))}
+          </div>
+          {/* Security footer */}
+          <div className="border-t border-stone-100 px-3 py-2 flex items-center justify-center gap-4 bg-stone-50/50">
+            {[
+              { icon: "lock" as const, text: "E2E Encrypted" },
+              { icon: "shield" as const, text: "Dữ liệu tại VN" },
+            ].map((s, i) => (
+              <div key={i} className="flex items-center gap-1 text-[9px] text-emerald-600 font-medium">
+                <Icon name={s.icon} size={9} />
+                {s.text}
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function FeatureMockup({ type }: { type: string }) {
   const mockups: Record<string, React.ReactNode> = {
     "session-notes": <SessionNotesMockup />,
@@ -1158,49 +1303,7 @@ function FeatureMockup({ type }: { type: string }) {
       </div>
     ),
     "smart-scheduling": <ScheduleMockup />,
-    telehealth: (
-      <div className="space-y-3">
-        {/* mock video */}
-        <div className="relative bg-stone-800 rounded-xl h-32 flex items-center justify-center overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-br from-stone-700 to-stone-900" />
-          <div className="relative flex flex-col items-center gap-2">
-            <div className="w-12 h-12 rounded-full bg-stone-600 flex items-center justify-center">
-              <span className="text-white text-lg font-semibold">TC</span>
-            </div>
-            <span className="text-stone-400 text-[11px]">
-              Đang kết nối...
-            </span>
-          </div>
-          {/* PiP */}
-          <div className="absolute bottom-2 right-2 w-16 h-12 rounded-lg bg-stone-600 border-2 border-stone-500 flex items-center justify-center">
-            <span className="text-stone-300 text-[9px]">Bạn</span>
-          </div>
-          {/* Recording badge */}
-          <div className="absolute top-2 left-2 flex items-center gap-1 bg-red-500/90 px-2 py-0.5 rounded-full">
-            <div className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
-            <span className="text-white text-[9px] font-medium">REC</span>
-          </div>
-        </div>
-        {/* Controls */}
-        <div className="flex items-center justify-center gap-3">
-          {["Mic", "Camera", "Share", "Record"].map((l) => (
-            <div
-              key={l}
-              className="w-9 h-9 rounded-full bg-stone-200 flex items-center justify-center"
-            >
-              <span className="text-[9px] text-stone-500">{l}</span>
-            </div>
-          ))}
-          <div className="w-9 h-9 rounded-full bg-red-500 flex items-center justify-center">
-            <span className="text-[9px] text-white font-semibold">End</span>
-          </div>
-        </div>
-        <div className="flex items-center justify-center gap-1.5 text-[10px] text-emerald-600">
-          <Icon name="lock" size={10} />
-          Mã hóa đầu-cuối
-        </div>
-      </div>
-    ),
+    telehealth: <TelehealthMockup />,
   };
   return (
     <div className="bg-stone-50/80 rounded-2xl border border-stone-200/70 p-5 shadow-inner">
