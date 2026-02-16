@@ -480,137 +480,130 @@ function StickyHeader() {
   );
 }
 
-function HeroBeforeAfter() {
-  const [showAfter, setShowAfter] = useState(false);
+function HeroComparisonSlider() {
+  const [sliderPos, setSliderPos] = useState(75); // start showing mostly "before"
+  const [isDragging, setIsDragging] = useState(false);
+  const [isAutoPlaying, setIsAutoPlaying] = useState(true);
+  const [userInteracted, setUserInteracted] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    const timer = setTimeout(() => setShowAfter(true), 2500);
-    return () => clearTimeout(timer);
-  }, []);
+  // Gradual highlight: 0 = no highlight, 1 = full highlight
+  const beforeIntensity = Math.min(1, Math.max(0, (sliderPos - 50) / 50));
+  const afterIntensity = Math.min(1, Math.max(0, (50 - sliderPos) / 50));
 
+  // Auto-animate slider with pause at edges
   useEffect(() => {
-    if (!showAfter) return;
-    const interval = setInterval(() => {
-      setShowAfter((prev) => !prev);
+    if (!isAutoPlaying) return;
+    let raf: number;
+    let start: number | null = null;
+    const sweepDuration = 2500;
+    const pauseDuration = 2500; // longer pause at edges
+    const cycleDuration = sweepDuration + pauseDuration;
+    const fullCycle = cycleDuration * 2;
+
+    const animate = (timestamp: number) => {
+      if (!start) start = timestamp;
+      const elapsed = (timestamp - start) % fullCycle;
+
+      let pos: number;
+      if (elapsed < sweepDuration) {
+        // Sweeping from 100 to 0 (revealing "after")
+        const p = elapsed / sweepDuration;
+        const eased = p < 0.5 ? 2 * p * p : 1 - Math.pow(-2 * p + 2, 2) / 2;
+        pos = 100 - eased * 100;
+      } else if (elapsed < cycleDuration) {
+        // Pausing at 0 (fully showing "after")
+        pos = 0;
+      } else if (elapsed < cycleDuration + sweepDuration) {
+        // Sweeping from 0 to 100 (revealing "before")
+        const p = (elapsed - cycleDuration) / sweepDuration;
+        const eased = p < 0.5 ? 2 * p * p : 1 - Math.pow(-2 * p + 2, 2) / 2;
+        pos = eased * 100;
+      } else {
+        // Pausing at 100 (fully showing "before")
+        pos = 100;
+      }
+
+      setSliderPos(pos);
+      raf = requestAnimationFrame(animate);
+    };
+    raf = requestAnimationFrame(animate);
+    return () => cancelAnimationFrame(raf);
+  }, [isAutoPlaying]);
+
+  // Resume auto after 5s of no interaction
+  useEffect(() => {
+    if (!userInteracted) return;
+    const timer = setTimeout(() => {
+      setIsAutoPlaying(true);
+      setUserInteracted(false);
     }, 5000);
-    return () => clearInterval(interval);
-  }, [showAfter]);
+    return () => clearTimeout(timer);
+  }, [userInteracted]);
+
+  const handleInteractionStart = () => {
+    setIsDragging(true);
+    setIsAutoPlaying(false);
+    setUserInteracted(true);
+  };
+
+  const handleInteractionEnd = () => {
+    setIsDragging(false);
+  };
+
+  const updatePosition = (clientX: number) => {
+    if (!containerRef.current) return;
+    const rect = containerRef.current.getBoundingClientRect();
+    const x = clientX - rect.left;
+    const pct = Math.max(0, Math.min(100, (x / rect.width) * 100));
+    setSliderPos(pct);
+  };
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!isDragging) return;
+    updatePosition(e.clientX);
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (!isDragging) return;
+    updatePosition(e.touches[0].clientX);
+  };
 
   return (
     <div className="relative">
-      {/* Toggle */}
-      <div className="flex items-center justify-center gap-2 mb-4">
-        <button
-          onClick={() => setShowAfter(false)}
-          className={`px-4 py-1.5 rounded-full text-xs font-semibold transition-all duration-300 ${
-            !showAfter ? "bg-red-50 text-red-600 border border-red-200 shadow-sm" : "text-stone-400 hover:text-stone-600"
-          }`}
-        >
-          Hiện tại
-        </button>
-        <button
-          onClick={() => setShowAfter(true)}
-          className={`px-4 py-1.5 rounded-full text-xs font-semibold transition-all duration-300 ${
-            showAfter ? "bg-teal-50 text-teal-700 border border-teal-200 shadow-sm" : "text-stone-400 hover:text-stone-600"
-          }`}
-        >
-          Với TherapistAI
-        </button>
-      </div>
-
-      <div className="relative bg-white rounded-2xl shadow-2xl shadow-stone-900/10 border border-stone-200/60 overflow-hidden min-h-[320px]">
-        {/* ── BEFORE: Chaotic multi-tool workflow ── */}
-        <div className={`absolute inset-0 transition-all duration-700 ${!showAfter ? "opacity-100 scale-100" : "opacity-0 scale-95 pointer-events-none"}`}>
+      <div
+        ref={containerRef}
+        className="relative bg-white rounded-2xl shadow-2xl shadow-stone-900/10 border border-stone-200/60 overflow-hidden select-none"
+        style={{ minHeight: 340 }}
+        onMouseMove={handleMouseMove}
+        onMouseUp={handleInteractionEnd}
+        onMouseLeave={handleInteractionEnd}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleInteractionEnd}
+      >
+        {/* ── AFTER layer (underneath) ── */}
+        <div className="absolute inset-0">
           <div className="p-5 md:p-6 h-full flex flex-col">
-            <div className="text-[10px] font-semibold text-red-500 uppercase tracking-widest mb-4">Quy trình hiện tại</div>
-
-            {/* Scattered tool windows */}
-            <div className="flex-1 relative">
-              {/* Google Docs */}
-              <div className="absolute top-0 left-0 w-[55%] bg-white rounded-lg border border-stone-200 shadow-md p-2.5 rotate-[-2deg] z-10">
-                <div className="flex items-center gap-1.5 mb-2">
-                  <div className="w-4 h-4 rounded bg-blue-500 flex items-center justify-center text-[7px] text-white font-bold">D</div>
-                  <span className="text-[9px] text-stone-500">session_note_final_v3.docx</span>
-                </div>
-                <div className="space-y-1">
-                  <div className="h-1.5 bg-stone-100 rounded w-full" />
-                  <div className="h-1.5 bg-stone-100 rounded w-[80%]" />
-                  <div className="h-1.5 bg-stone-100 rounded w-[60%]" />
-                </div>
-              </div>
-
-              {/* Excel */}
-              <div className="absolute top-8 right-0 w-[50%] bg-white rounded-lg border border-stone-200 shadow-md p-2.5 rotate-[3deg] z-20">
-                <div className="flex items-center gap-1.5 mb-2">
-                  <div className="w-4 h-4 rounded bg-emerald-600 flex items-center justify-center text-[7px] text-white font-bold">X</div>
-                  <span className="text-[9px] text-stone-500">PHQ9_tracking.xlsx</span>
-                </div>
-                <div className="grid grid-cols-4 gap-0.5">
-                  {Array.from({ length: 12 }).map((_, i) => (
-                    <div key={i} className="h-2.5 bg-stone-50 border border-stone-200 rounded-sm text-[5px] text-stone-300 flex items-center justify-center">{i < 4 ? ["T1", "T2", "T3", "T4"][i] : ""}</div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Zoom */}
-              <div className="absolute bottom-8 left-[10%] w-[45%] bg-stone-800 rounded-lg shadow-md p-2.5 rotate-[1deg] z-30">
-                <div className="flex items-center gap-1.5 mb-2">
-                  <div className="w-4 h-4 rounded bg-blue-400 flex items-center justify-center text-[7px] text-white font-bold">Z</div>
-                  <span className="text-[9px] text-stone-400">Zoom Meeting</span>
-                </div>
-                <div className="flex gap-1">
-                  <div className="flex-1 h-8 bg-stone-700 rounded" />
-                  <div className="w-6 h-8 bg-stone-600 rounded" />
-                </div>
-              </div>
-
-              {/* Calendar */}
-              <div className="absolute bottom-2 right-[5%] w-[40%] bg-white rounded-lg border border-stone-200 shadow-md p-2.5 rotate-[-1deg] z-20">
-                <div className="flex items-center gap-1.5 mb-1.5">
-                  <div className="w-4 h-4 rounded bg-red-500 flex items-center justify-center text-[7px] text-white font-bold">C</div>
-                  <span className="text-[9px] text-stone-500">Google Calendar</span>
-                </div>
-                <div className="space-y-0.5">
-                  {["09:00 - Nguyễn V.A", "10:30 - Trần T.B"].map((t) => (
-                    <div key={t} className="text-[7px] text-stone-500 bg-blue-50 px-1.5 py-0.5 rounded">{t}</div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Frustration indicators */}
-              <div className="absolute top-[40%] left-[40%] z-40">
-                <div className="bg-red-50 border border-red-200 rounded-full px-2 py-0.5 text-[8px] text-red-500 font-medium animate-pulse">
-                  Alt+Tab...
-                </div>
-              </div>
-            </div>
-
-            {/* Bottom pain label */}
-            <div className="mt-3 flex items-center gap-2 text-[10px] text-red-500">
-              <Icon name="clock" size={12} />
-              <span>4+ công cụ &middot; Copy-paste liên tục &middot; Dữ liệu phân tán</span>
-            </div>
-          </div>
-        </div>
-
-        {/* ── AFTER: Clean TherapistAI dashboard ── */}
-        <div className={`absolute inset-0 transition-all duration-700 ${showAfter ? "opacity-100 scale-100" : "opacity-0 scale-105 pointer-events-none"}`}>
-          <div className="p-5 md:p-6 h-full flex flex-col">
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-2">
+            {/* After label - inside mockup */}
+            <div className="flex items-center justify-end mb-4">
+              <div
+                className="flex items-center gap-2 origin-right"
+                style={{
+                  transform: `scale(${1 + afterIntensity * 0.2})`,
+                  filter: `drop-shadow(0 0 ${afterIntensity * 10}px rgba(20, 184, 166, ${afterIntensity * 0.4}))`,
+                }}
+              >
+                <span
+                  className="text-xs font-bold"
+                  style={{ color: `rgb(${Math.round(68 - afterIntensity * 34)}, ${Math.round(68 + afterIntensity * 100)}, ${Math.round(68 + afterIntensity * 98)})` }}
+                >TherapistAI</span>
                 <div className="w-6 h-6 rounded-lg overflow-hidden shrink-0">
                   <img src="/logo.png" alt="logo" className="w-full h-full object-cover scale-[2]" />
                 </div>
-                <span className="text-xs font-bold text-stone-700">TherapistAI</span>
-                <div className="px-2 py-0.5 bg-teal-100 text-teal-700 text-[8px] font-semibold rounded-full">Tất cả trong 1</div>
-              </div>
-              <div className="flex items-center gap-1">
-                <div className="w-5 h-5 rounded-full bg-stone-100" />
-                <span className="text-[10px] text-stone-500">BS. Minh</span>
               </div>
             </div>
 
-            {/* AI Notes section */}
+            {/* AI Session Notes */}
             <div className="bg-teal-50/60 rounded-xl p-3 mb-3 border border-teal-100">
               <div className="flex items-center gap-1.5 mb-2">
                 <Icon name="sparkles" size={10} className="text-teal-600" />
@@ -624,18 +617,25 @@ function HeroBeforeAfter() {
               </div>
             </div>
 
-            {/* Mini stats + chart */}
             <div className="grid grid-cols-2 gap-2 mb-3">
+              {/* Progress Tracking */}
               <div className="bg-stone-50 rounded-lg p-2.5 border border-stone-100">
-                <div className="text-[9px] text-stone-500 mb-1">PHQ-9 Trend</div>
+                <div className="flex items-center justify-between mb-1">
+                  <div className="text-[9px] text-stone-500">PHQ-9 Trend</div>
+                  <div className="px-1.5 py-0.5 bg-teal-50 text-teal-600 text-[6px] font-semibold rounded-full">Progress Tracking</div>
+                </div>
                 <div className="flex items-end gap-0.5 h-8">
                   {[18, 15, 12, 9].map((v, i) => (
                     <div key={i} className="flex-1 rounded-t" style={{ height: `${(v / 20) * 100}%`, background: v > 14 ? "#ef4444" : v > 9 ? "#f59e0b" : "#10b981" }} />
                   ))}
                 </div>
               </div>
+              {/* AI Treatment Suggestions */}
               <div className="bg-stone-50 rounded-lg p-2.5 border border-stone-100">
-                <div className="text-[9px] text-stone-500 mb-1">Gợi ý AI</div>
+                <div className="flex items-center justify-between mb-1">
+                  <div className="text-[9px] text-stone-500">Gợi ý AI</div>
+                  <div className="px-1.5 py-0.5 bg-teal-50 text-teal-600 text-[6px] font-semibold rounded-full">AI Suggestions</div>
+                </div>
                 <div className="text-[10px] font-semibold text-stone-700">CBT — Tái cấu trúc</div>
                 <div className="flex items-center gap-1 mt-1">
                   <div className="h-1 flex-1 bg-stone-200 rounded-full"><div className="h-full bg-emerald-500 rounded-full" style={{ width: "92%" }} /></div>
@@ -644,24 +644,129 @@ function HeroBeforeAfter() {
               </div>
             </div>
 
-            {/* Schedule */}
-            <div className="space-y-1">
-              {[
-                { time: "09:00", name: "Nguyễn V. A", tag: "Follow-up", cls: "bg-teal-100 text-teal-700" },
-                { time: "10:30", name: "Trần T. B", tag: "Initial", cls: "bg-blue-100 text-blue-700" },
-              ].map((s) => (
-                <div key={s.time} className="flex items-center gap-2 p-1.5 rounded-lg bg-white border border-stone-100">
-                  <span className="text-[9px] font-mono text-stone-400 w-7">{s.time}</span>
-                  <span className="text-[10px] font-medium text-stone-700 flex-1">{s.name}</span>
-                  <span className={`px-1.5 py-0.5 rounded text-[8px] font-semibold ${s.cls}`}>{s.tag}</span>
-                </div>
-              ))}
+            {/* Smart Schedule */}
+            <div>
+              <div className="flex items-center justify-between mb-1.5">
+                <div className="text-[9px] font-semibold text-stone-500">Lịch hẹn</div>
+                <div className="px-1.5 py-0.5 bg-teal-50 text-teal-600 text-[6px] font-semibold rounded-full">Smart Schedule</div>
+              </div>
+              <div className="space-y-1">
+                {[
+                  { time: "09:00", name: "Nguyễn V. A", tag: "Follow-up", cls: "bg-teal-100 text-teal-700" },
+                  { time: "10:30", name: "Trần T. B", tag: "Initial", cls: "bg-blue-100 text-blue-700" },
+                ].map((s) => (
+                  <div key={s.time} className="flex items-center gap-2 p-1.5 rounded-lg bg-white border border-stone-100">
+                    <span className="text-[9px] font-mono text-stone-400 w-7">{s.time}</span>
+                    <span className="text-[10px] font-medium text-stone-700 flex-1">{s.name}</span>
+                    <span className={`px-1.5 py-0.5 rounded text-[8px] font-semibold ${s.cls}`}>{s.tag}</span>
+                  </div>
+                ))}
+              </div>
             </div>
 
-            {/* Bottom benefit */}
             <div className="mt-auto pt-3 flex items-center gap-2 text-[10px] text-teal-600">
               <Icon name="check" size={12} />
               <span>1 nền tảng &middot; AI hỗ trợ &middot; Tiết kiệm 2h mỗi ngày</span>
+            </div>
+          </div>
+        </div>
+
+        {/* ── BEFORE layer (on top, clipped by slider) ── */}
+        <div
+          className="absolute inset-0 overflow-hidden"
+          style={{ width: `${sliderPos}%` }}
+        >
+          <div className="bg-stone-50 border-r border-stone-200" style={{ width: containerRef.current ? `${containerRef.current.offsetWidth}px` : "100vw", minHeight: 340 }}>
+            <div className="p-5 md:p-6 h-full flex flex-col" style={{ minHeight: 340 }}>
+              {/* Before label - inside mockup */}
+              <div className="mb-4">
+                <div
+                  className="text-[10px] font-semibold uppercase tracking-widest origin-left"
+                  style={{
+                    transform: `scale(${1 + beforeIntensity * 0.2})`,
+                    color: `rgb(${Math.round(168 + beforeIntensity * 71)}, ${Math.round(162 - beforeIntensity * 94)}, ${Math.round(158 - beforeIntensity * 90)})`,
+                    textShadow: beforeIntensity > 0.3 ? `0 0 ${beforeIntensity * 12}px rgba(239, 68, 68, ${beforeIntensity * 0.3})` : "none",
+                  }}
+                >Quy trình hiện tại</div>
+              </div>
+
+              <div className="flex-1 relative" style={{ minHeight: 180 }}>
+                <div className="absolute top-0 left-0 w-[55%] bg-white rounded-lg border border-stone-200 shadow-md p-2.5 rotate-[-2deg] z-10">
+                  <div className="flex items-center gap-1.5 mb-2">
+                    <div className="w-4 h-4 rounded bg-blue-500 flex items-center justify-center text-[7px] text-white font-bold">D</div>
+                    <span className="text-[9px] text-stone-500">session_note_v3.docx</span>
+                  </div>
+                  <div className="space-y-1">
+                    <div className="h-1.5 bg-stone-100 rounded w-full" />
+                    <div className="h-1.5 bg-stone-100 rounded w-[80%]" />
+                    <div className="h-1.5 bg-stone-100 rounded w-[60%]" />
+                  </div>
+                </div>
+
+                <div className="absolute top-8 right-0 w-[50%] bg-white rounded-lg border border-stone-200 shadow-md p-2.5 rotate-[3deg] z-20">
+                  <div className="flex items-center gap-1.5 mb-2">
+                    <div className="w-4 h-4 rounded bg-emerald-600 flex items-center justify-center text-[7px] text-white font-bold">X</div>
+                    <span className="text-[9px] text-stone-500">PHQ9_tracking.xlsx</span>
+                  </div>
+                  <div className="grid grid-cols-4 gap-0.5">
+                    {Array.from({ length: 12 }).map((_, i) => (
+                      <div key={i} className="h-2.5 bg-stone-50 border border-stone-200 rounded-sm text-[5px] text-stone-300 flex items-center justify-center">{i < 4 ? ["T1", "T2", "T3", "T4"][i] : ""}</div>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="absolute bottom-8 left-[10%] w-[45%] bg-stone-800 rounded-lg shadow-md p-2.5 rotate-[1deg] z-30">
+                  <div className="flex items-center gap-1.5 mb-2">
+                    <div className="w-4 h-4 rounded bg-blue-400 flex items-center justify-center text-[7px] text-white font-bold">Z</div>
+                    <span className="text-[9px] text-stone-400">Zoom Meeting</span>
+                  </div>
+                  <div className="flex gap-1">
+                    <div className="flex-1 h-8 bg-stone-700 rounded" />
+                    <div className="w-6 h-8 bg-stone-600 rounded" />
+                  </div>
+                </div>
+
+                <div className="absolute bottom-2 right-[5%] w-[40%] bg-white rounded-lg border border-stone-200 shadow-md p-2.5 rotate-[-1deg] z-20">
+                  <div className="flex items-center gap-1.5 mb-1.5">
+                    <div className="w-4 h-4 rounded bg-red-500 flex items-center justify-center text-[7px] text-white font-bold">C</div>
+                    <span className="text-[9px] text-stone-500">Google Calendar</span>
+                  </div>
+                  <div className="space-y-0.5">
+                    {["09:00 - Nguyễn V.A", "10:30 - Trần T.B"].map((t) => (
+                      <div key={t} className="text-[7px] text-stone-500 bg-blue-50 px-1.5 py-0.5 rounded">{t}</div>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="absolute top-[40%] left-[40%] z-40">
+                  <div className="bg-red-50 border border-red-200 rounded-full px-2 py-0.5 text-[8px] text-red-500 font-medium animate-pulse">
+                    Alt+Tab...
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-3 flex items-center gap-2 text-[10px] text-red-500">
+                <Icon name="clock" size={12} />
+                <span>4+ công cụ &middot; Copy-paste liên tục &middot; Dữ liệu phân tán</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* ── Slider handle ── */}
+        <div
+          className="absolute top-0 bottom-0 z-50 flex items-center cursor-ew-resize"
+          style={{ left: `${sliderPos}%`, transform: "translateX(-50%)", width: 24 }}
+          onMouseDown={handleInteractionStart}
+          onTouchStart={handleInteractionStart}
+        >
+          {/* Vertical line */}
+          <div className="absolute inset-y-0 w-[2px] bg-white/90 left-1/2 -translate-x-1/2 shadow-sm" />
+          {/* Small handle circle */}
+          <div className={`relative w-5 h-5 rounded-full bg-white border border-stone-300 shadow-md flex items-center justify-center cursor-ew-resize transition-all ${isDragging ? "scale-110 shadow-lg border-teal-400" : "hover:scale-110 hover:border-teal-400"}`}>
+            <div className="flex gap-[2px]">
+              <div className="w-[1.5px] h-2 bg-stone-300 rounded-full" />
+              <div className="w-[1.5px] h-2 bg-stone-300 rounded-full" />
             </div>
           </div>
         </div>
@@ -1090,8 +1195,8 @@ export default function LandingPage() {
               </p>
             </div>
 
-            {/* Hero mockup - Before/After */}
-            <HeroBeforeAfter />
+            {/* Hero mockup - Comparison Slider */}
+            <HeroComparisonSlider />
           </div>
         </div>
       </section>
