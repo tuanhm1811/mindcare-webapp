@@ -38,7 +38,7 @@ const FEATURES = [
   {
     tag: "Tiết kiệm 2 giờ mỗi ngày",
     title: "AI Session Notes",
-    desc: "Kết thúc phiên trị liệu, ghi chú SOAP đã sẵn sàng. AI lắng nghe, tóm tắt, và tạo bản nháp — bạn chỉ cần review và phê duyệt. Giảm 80% thời gian documentation.",
+    desc: "Kết thúc phiên trị liệu, ghi chú lập tức sẵn sàng. AI lắng nghe, tóm tắt, và tạo bản tóm tắt nháp — bạn chỉ cần review và phê duyệt. Giảm 80% thời gian ghi chép.",
     mockup: "session-notes",
   },
   {
@@ -50,7 +50,7 @@ const FEATURES = [
   {
     tag: "Evidence-based, luôn cập nhật",
     title: "AI Treatment Suggestions",
-    desc: "Gợi ý can thiệp dựa trên DSM-5 và các phác đồ trị liệu được chứng minh hiệu quả. Không thay thế chuyên môn — mà hỗ trợ ra quyết định lâm sàng tốt hơn.",
+    desc: "Gợi ý can thiệp dựa trên tài liệu được bác sĩ cung cấp. Không thay thế chuyên môn — mà hỗ trợ ra quyết định lâm sàng tốt hơn.",
     mockup: "treatment-suggestions",
   },
   {
@@ -775,6 +775,121 @@ function HeroComparisonSlider() {
   );
 }
 
+const TRANSCRIPT_LINES = [
+  { role: "therapist", text: "Tuần này giấc ngủ của bạn thế nào?" },
+  { role: "client", text: "Tốt hơn nhiều, em ngủ được 6-7 tiếng mỗi đêm rồi ạ." },
+  { role: "therapist", text: "So với trước đó thì sao?" },
+  { role: "client", text: "Trước chỉ ngủ được 4 tiếng, hay tỉnh giấc giữa đêm." },
+  { role: "therapist", text: "Bài tập thư giãn trước ngủ có giúp không?" },
+  { role: "client", text: "Có ạ, em thấy bớt lo âu hơn khi nằm xuống." },
+];
+
+const SOAP_SECTIONS = [
+  { key: "S", label: "Subjective", text: "TC báo cáo cải thiện giấc ngủ, 6-7 tiếng/đêm (trước: 4 tiếng). Giảm lo âu trước ngủ nhờ bài tập thư giãn." },
+  { key: "O", label: "Objective", text: "Biểu cảm phù hợp, giao tiếp mắt tốt. PHQ-9: 12 (↓ từ 18). Trang phục gọn gàng." },
+  { key: "A", label: "Assessment", text: "Tiến triển tích cực. Giảm triệu chứng mất ngủ và lo âu. Tiếp tục theo dõi." },
+  { key: "P", label: "Plan", text: "Duy trì bài tập thư giãn. Tái khám sau 2 tuần. Cân nhắc giảm liều nếu ổn định." },
+];
+
+function SessionNotesMockup() {
+  const [step, setStep] = useState(0); // 0..TRANSCRIPT_LINES.length = transcript phase, then SOAP phase
+  const totalTranscript = TRANSCRIPT_LINES.length;
+  const totalSoap = SOAP_SECTIONS.length;
+  const totalSteps = totalTranscript + 1 + totalSoap + 1; // transcript lines + "analyzing" + soap sections + hold
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setStep((s) => (s + 1) % totalSteps);
+    }, 1200);
+    return () => clearInterval(interval);
+  }, [totalSteps]);
+
+  const transcriptVisible = Math.min(step, totalTranscript);
+  const isAnalyzing = step === totalTranscript;
+  const soapVisible = step > totalTranscript ? Math.min(step - totalTranscript - 1, totalSoap) : 0;
+
+  return (
+    <div className="flex gap-2 h-full" style={{ minHeight: 260 }}>
+      {/* Left: Transcript */}
+      <div className="flex-1 flex flex-col min-w-0">
+        <div className="flex items-center gap-1.5 mb-2">
+          <div className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
+          <span className="text-[10px] font-semibold text-stone-500">Phiên trị liệu</span>
+        </div>
+        <div className="flex-1 space-y-1.5 overflow-hidden">
+          {TRANSCRIPT_LINES.map((line, i) => (
+            <div
+              key={i}
+              className="transition-all duration-500"
+              style={{
+                opacity: i < transcriptVisible ? 1 : 0,
+                transform: `translateY(${i < transcriptVisible ? 0 : 10}px)`,
+              }}
+            >
+              <div className={`text-[10px] font-semibold mb-0.5 ${line.role === "therapist" ? "text-teal-600" : "text-stone-500"}`}>
+                {line.role === "therapist" ? "BS. Minh" : "Thân chủ"}
+              </div>
+              <div className={`text-[10px] leading-relaxed px-2 py-1.5 rounded-lg ${line.role === "therapist" ? "bg-teal-50 text-stone-600" : "bg-stone-100 text-stone-600"}`}>
+                {line.text}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Divider with arrow */}
+      <div className="flex flex-col items-center justify-center gap-1 px-0.5">
+        <div className="w-px flex-1 bg-stone-200" />
+        <div className={`transition-all duration-500 ${isAnalyzing ? "text-teal-500 scale-110" : "text-stone-300"}`}>
+          <Icon name="sparkles" size={14} />
+        </div>
+        <div className="w-px flex-1 bg-stone-200" />
+      </div>
+
+      {/* Right: SOAP Note */}
+      <div className="flex-1 flex flex-col min-w-0">
+        <div className="flex items-center gap-1.5 mb-2">
+          <Icon name="sparkles" size={10} className="text-teal-600" />
+          <span className="text-[10px] font-semibold text-teal-700">AI Note</span>
+          {soapVisible >= totalSoap && (
+            <span className="ml-auto text-[8px] font-semibold text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded-full">Hoàn tất</span>
+          )}
+        </div>
+        <div className="flex-1 space-y-1.5 overflow-hidden">
+          {isAnalyzing && (
+            <div className="flex items-center gap-2 py-4 justify-center">
+              <div className="flex gap-1">
+                <div className="w-1.5 h-1.5 rounded-full bg-teal-400 animate-bounce" style={{ animationDelay: "0ms" }} />
+                <div className="w-1.5 h-1.5 rounded-full bg-teal-400 animate-bounce" style={{ animationDelay: "150ms" }} />
+                <div className="w-1.5 h-1.5 rounded-full bg-teal-400 animate-bounce" style={{ animationDelay: "300ms" }} />
+              </div>
+              <span className="text-[10px] text-teal-600">AI đang phân tích...</span>
+            </div>
+          )}
+          {!isAnalyzing && SOAP_SECTIONS.map((s, i) => (
+            <div
+              key={s.key}
+              className="transition-all duration-500"
+              style={{
+                opacity: i < soapVisible ? 1 : 0,
+                transform: `translateY(${i < soapVisible ? 0 : 8}px)`,
+              }}
+            >
+              <div className="flex items-center gap-1 mb-0.5">
+                <span className="w-4 h-4 rounded bg-teal-600 text-white text-[8px] font-bold flex items-center justify-center">{s.key}</span>
+                <span className="text-[9px] font-semibold text-teal-700 uppercase tracking-wider">{s.label}</span>
+              </div>
+              <div className="text-[10px] text-stone-600 leading-relaxed bg-white/80 rounded-lg px-2 py-1.5 border border-stone-200/60">
+                {s.text}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 const CHART_DATA = [
   { v: 21, label: "01/01" },
   { v: 18, label: "15/01" },
@@ -995,51 +1110,7 @@ function ScheduleMockup() {
 
 function FeatureMockup({ type }: { type: string }) {
   const mockups: Record<string, React.ReactNode> = {
-    "session-notes": (
-      <div className="space-y-3">
-        <div className="flex items-center gap-2 mb-4">
-          <div className="px-3 py-1 bg-teal-100 text-teal-700 text-xs font-semibold rounded-full">
-            SOAP Note
-          </div>
-          <div className="px-3 py-1 bg-stone-100 text-stone-500 text-xs rounded-full">
-            DAP
-          </div>
-          <div className="px-3 py-1 bg-stone-100 text-stone-500 text-xs rounded-full">
-            Free-form
-          </div>
-        </div>
-        <div className="space-y-2.5">
-          <div>
-            <div className="text-[11px] font-semibold text-teal-700 uppercase tracking-wider mb-1">
-              Subjective
-            </div>
-            <div className="bg-white/80 rounded-lg p-2.5 text-xs text-stone-600 leading-relaxed border border-stone-200/60">
-              Thân chủ báo cáo cải thiện giấc ngủ trong tuần qua, ngủ được
-              6-7 tiếng/đêm so với 4 tiếng trước đó...
-            </div>
-          </div>
-          <div>
-            <div className="text-[11px] font-semibold text-teal-700 uppercase tracking-wider mb-1">
-              Objective
-            </div>
-            <div className="bg-white/80 rounded-lg p-2.5 text-xs text-stone-600 leading-relaxed border border-stone-200/60">
-              Biểu cảm phù hợp, giao tiếp mắt tốt. PHQ-9: 12 (giảm từ 18).
-              Trang phục gọn gàng...
-            </div>
-          </div>
-          <div className="flex items-center gap-2 pt-1">
-            <div className="flex items-center gap-1 text-emerald-600 text-[11px] font-medium">
-              <Icon name="sparkles" size={12} />
-              AI đã tạo bản nháp
-            </div>
-            <div className="text-stone-300">|</div>
-            <div className="text-stone-400 text-[11px]">
-              Chỉnh sửa để hoàn tất
-            </div>
-          </div>
-        </div>
-      </div>
-    ),
+    "session-notes": <SessionNotesMockup />,
     "progress-dashboard": <ProgressChartMockup />,
     "treatment-suggestions": (
       <div className="space-y-2.5">
