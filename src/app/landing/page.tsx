@@ -1921,14 +1921,14 @@ export default function LandingPage() {
                 </li>
                 <li className="flex items-center gap-2">
                   <Icon name="phone" size={14} />
-                  1900 xxxx
+                  xxxx
                 </li>
                 <li className="flex items-start gap-2">
                   <Icon name="map-pin" size={14} className="shrink-0 mt-0.5" />
                   <span>
-                    Tầng 10, Tòa nhà ABC,
+                    68 Đặng Tiến Đông,
                     <br />
-                    Quận 1, TP. Hồ Chí Minh
+                    Hà Nội
                   </span>
                 </li>
               </ul>
