@@ -44,7 +44,7 @@ const FEATURES = [
   {
     tag: "Nhìn rõ tiến trình",
     title: "Client Progress Dashboard",
-    desc: "Biểu đồ PHQ-9, GAD-7 theo thời gian. Phát hiện xu hướng mà mắt thường dễ bỏ sót. Chia sẻ báo cáo trực quan với thân chủ để tăng động lực trị liệu.",
+    desc: "Theo dõi tiến trình điều trị theo thời gian. Phát hiện xu hướng mà mắt thường dễ bỏ sót. Chia sẻ báo cáo trực quan với thân chủ để tăng động lực trị liệu.",
     mockup: "progress-dashboard",
   },
   {
@@ -70,8 +70,8 @@ const FEATURES = [
 const STEPS = [
   {
     num: 1,
-    title: "Đăng ký miễn phí",
-    desc: "Tạo tài khoản trong 30 giây. Không cần thẻ tín dụng, không cam kết.",
+    title: "Đăng ký waitlist",
+    desc: "Để lại thông tin trong 30 giây. Được ưu tiên trải nghiệm sớm nhất.",
     icon: "user-plus",
   },
   {
@@ -98,8 +98,8 @@ const PLANS = [
   {
     name: "Starter",
     price: "Miễn phí",
-    period: "14 ngày dùng thử",
-    desc: "Trải nghiệm đầy đủ tính năng",
+    period: "Early access",
+    desc: "Ưu tiên trải nghiệm sớm nhất",
     features: [
       "AI Session Notes (không giới hạn)",
       "Client Progress Dashboard",
@@ -107,7 +107,7 @@ const PLANS = [
       "Secure video call",
       "Hỗ trợ email",
     ],
-    cta: "Bắt đầu miễn phí",
+    cta: "Tham gia waitlist",
     highlighted: false,
   },
   {
@@ -123,7 +123,7 @@ const PLANS = [
       "Xuất báo cáo PDF",
       "Hỗ trợ ưu tiên 24/7",
     ],
-    cta: "Dùng thử miễn phí",
+    cta: "Tham gia waitlist",
     highlighted: true,
   },
   {
@@ -159,7 +159,7 @@ const FAQS = [
   },
   {
     q: "Chi phí sử dụng như thế nào?",
-    a: "Bạn được dùng thử miễn phí 14 ngày với đầy đủ tính năng. Sau đó, gói Professional từ 890.000đ/tháng — tương đương chi phí 1 giờ trị liệu, nhưng tiết kiệm cho bạn hàng chục giờ mỗi tháng.",
+    a: "Hiện tại sản phẩm đang trong giai đoạn phát triển. Bạn có thể tham gia waitlist để được ưu tiên trải nghiệm sớm nhất và hoàn toàn miễn phí. Sau khi ra mắt, gói Professional dự kiến từ 890.000đ/tháng.",
   },
   {
     q: "TherapistAI hoạt động trên những thiết bị nào?",
@@ -439,7 +439,7 @@ function StickyHeader() {
           onClick={(e) => handleNav(e, "#pricing")}
           className="hidden md:inline-flex items-center gap-2 px-5 py-2.5 text-sm font-semibold text-white bg-gradient-to-r from-teal-600 to-teal-700 rounded-xl shadow-md shadow-teal-600/20 hover:shadow-lg hover:shadow-teal-600/30 hover:-translate-y-0.5 transition-all duration-200"
         >
-          Dùng thử miễn phí
+          Tham gia waitlist
         </a>
 
         {/* Mobile menu toggle */}
@@ -471,7 +471,7 @@ function StickyHeader() {
               onClick={(e) => handleNav(e, "#pricing")}
               className="mt-2 mx-4 text-center px-5 py-3 text-base font-semibold text-white bg-gradient-to-r from-teal-600 to-teal-700 rounded-xl shadow-md"
             >
-              Dùng thử miễn phí
+              Tham gia waitlist
             </a>
           </nav>
         </div>
@@ -775,6 +775,224 @@ function HeroComparisonSlider() {
   );
 }
 
+const CHART_DATA = [
+  { v: 21, label: "01/01" },
+  { v: 18, label: "15/01" },
+  { v: 16, label: "29/01" },
+  { v: 14, label: "12/02" },
+  { v: 12, label: "26/02" },
+  { v: 10, label: "12/03" },
+  { v: 8, label: "26/03" },
+];
+
+function ProgressChartMockup() {
+  const [animated, setAnimated] = useState(false);
+
+  // Animate in, then loop: grow → hold → shrink → hold
+  useEffect(() => {
+    const timer = setTimeout(() => setAnimated(true), 300);
+    return () => clearTimeout(timer);
+  }, []);
+
+  // Loop animation every 6s
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setAnimated(false);
+      setTimeout(() => setAnimated(true), 400);
+    }, 6000);
+    return () => clearInterval(interval);
+  }, []);
+
+  return (
+    <div className="space-y-3">
+      <div className="flex items-center justify-between mb-1">
+        <div className="text-xs font-semibold text-stone-700">PHQ-9 Progress</div>
+        <div className="text-[11px] text-emerald-600 font-medium">-38% so với baseline</div>
+      </div>
+      <div className="flex gap-1">
+        <div className="flex flex-col justify-between h-40 text-[8px] text-stone-400 font-mono pr-1 py-1">
+          <span>27</span><span>20</span><span>15</span><span>10</span><span>5</span><span>0</span>
+        </div>
+        <div className="flex-1 relative">
+          <div className="absolute inset-0 flex flex-col rounded-lg overflow-hidden">
+            <div style={{ height: "26%" }} className="bg-red-50/70 border-b border-dashed border-red-200/50" />
+            <div style={{ height: "18.5%" }} className="bg-amber-50/50 border-b border-dashed border-amber-200/50" />
+            <div style={{ height: "18.5%" }} className="bg-emerald-50/50 border-b border-dashed border-emerald-200/50" />
+            <div style={{ height: "37%" }} className="bg-stone-50/30" />
+          </div>
+          <div className="relative h-40 flex items-end gap-1.5 px-1 z-10 pb-4">
+            {CHART_DATA.map((d, i) => {
+              const maxH = 120;
+              const barPx = Math.round((d.v / 27) * maxH);
+              const color = d.v > 14 ? "#ef4444" : d.v > 9 ? "#f59e0b" : "#10b981";
+              const grad = d.v > 14 ? "linear-gradient(to top, #fca5a5, #ef4444)" : d.v > 9 ? "linear-gradient(to top, #fcd34d, #f59e0b)" : "linear-gradient(to top, #6ee7b7, #10b981)";
+              return (
+                <div key={i} className="flex-1 flex flex-col items-center justify-end">
+                  <span
+                    className="text-[9px] font-bold mb-0.5 transition-all duration-500"
+                    style={{
+                      color,
+                      opacity: animated ? 1 : 0,
+                      transform: `translateY(${animated ? 0 : 8}px)`,
+                      transitionDelay: `${i * 120 + 300}ms`,
+                    }}
+                  >{d.v}</span>
+                  <div
+                    className="w-full rounded-t-md transition-all ease-out"
+                    style={{
+                      height: animated ? barPx : 0,
+                      background: grad,
+                      transitionDuration: "800ms",
+                      transitionDelay: `${i * 120}ms`,
+                    }}
+                  />
+                  <span
+                    className="text-[7px] text-stone-400 mt-1 transition-opacity duration-300"
+                    style={{ opacity: animated ? 1 : 0, transitionDelay: `${i * 80}ms` }}
+                  >{d.label}</span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+      <div className="flex items-center justify-between">
+        <div className="flex gap-3">
+          <div className="flex items-center gap-1">
+            <div className="w-2 h-2 rounded-full bg-red-500" />
+            <span className="text-[10px] text-stone-500">Nặng (&gt;14)</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <div className="w-2 h-2 rounded-full bg-amber-500" />
+            <span className="text-[10px] text-stone-500">TB (10-14)</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <div className="w-2 h-2 rounded-full bg-emerald-500" />
+            <span className="text-[10px] text-stone-500">Nhẹ (&lt;10)</span>
+          </div>
+        </div>
+        <div className="text-[10px] text-emerald-600 font-medium">↓ Giảm dần</div>
+      </div>
+    </div>
+  );
+}
+
+const SCHEDULE_DATA = [
+  { time: "09:00", name: "Nguyễn Văn A", type: "Follow-up", color: "bg-teal-500" },
+  { time: "10:30", name: "Trần Thị B", type: "Initial", color: "bg-blue-500" },
+  { time: "14:00", name: "Lê Văn C", type: "Crisis", color: "bg-red-500" },
+  { time: "15:30", name: "Phạm Thị D", type: "Assessment", color: "bg-purple-500" },
+];
+
+function ScheduleMockup() {
+  const [view, setView] = useState(0); // 0 = list, 1 = calendar
+
+  useEffect(() => {
+    const interval = setInterval(() => setView((v) => (v === 0 ? 1 : 0)), 3000);
+    return () => clearInterval(interval);
+  }, []);
+
+  // Calendar week data
+  const days = ["T2", "T3", "T4", "T5", "T6"];
+  const hours = ["09", "10", "11", "14", "15", "16"];
+  const slots: Record<string, { color: string; name: string }> = {
+    "T2-09": { color: "bg-teal-400", name: "NVA" },
+    "T2-10": { color: "bg-blue-400", name: "TTB" },
+    "T2-14": { color: "bg-red-400", name: "LVC" },
+    "T2-15": { color: "bg-purple-400", name: "PTD" },
+    "T3-09": { color: "bg-blue-400", name: "TTB" },
+    "T3-14": { color: "bg-teal-400", name: "NVA" },
+    "T4-10": { color: "bg-purple-400", name: "PTD" },
+    "T4-15": { color: "bg-teal-400", name: "NVA" },
+    "T5-09": { color: "bg-red-400", name: "LVC" },
+    "T5-11": { color: "bg-blue-400", name: "TTB" },
+    "T6-10": { color: "bg-teal-400", name: "NVA" },
+    "T6-14": { color: "bg-purple-400", name: "PTD" },
+  };
+
+  return (
+    <div className="relative overflow-hidden" style={{ minHeight: 220 }}>
+      {/* View toggle dots */}
+      <div className="absolute top-0 right-0 flex items-center gap-1.5 z-10">
+        {["Ngày", "Tuần"].map((label, i) => (
+          <button
+            key={label}
+            onClick={() => setView(i)}
+            className={`px-2 py-0.5 rounded-full text-[9px] font-semibold transition-all ${view === i ? "bg-teal-100 text-teal-700" : "text-stone-400 hover:text-stone-600"}`}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+
+      {/* List view */}
+      <div
+        className="absolute inset-0 transition-all duration-500"
+        style={{
+          opacity: view === 0 ? 1 : 0,
+          transform: `translateX(${view === 0 ? 0 : -20}px)`,
+          pointerEvents: view === 0 ? "auto" : "none",
+        }}
+      >
+        <div className="space-y-2">
+          <div className="text-xs font-semibold text-stone-700 mb-3">Thứ Hai, 17/02</div>
+          {SCHEDULE_DATA.map((s, i) => (
+            <div key={i} className="flex items-center gap-3 p-2 bg-white/80 rounded-lg border border-stone-200/60">
+              <div className="text-[11px] text-stone-400 font-mono w-10">{s.time}</div>
+              <div className={`w-1 h-8 rounded-full ${s.color}`} />
+              <div className="flex-1">
+                <div className="text-xs font-medium text-stone-700">{s.name}</div>
+                <div className="text-[10px] text-stone-400">{s.type}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Calendar grid view */}
+      <div
+        className="absolute inset-0 transition-all duration-500"
+        style={{
+          opacity: view === 1 ? 1 : 0,
+          transform: `translateX(${view === 1 ? 0 : 20}px)`,
+          pointerEvents: view === 1 ? "auto" : "none",
+        }}
+      >
+        <div className="text-xs font-semibold text-stone-700 mb-3">Tuần 17–21/02</div>
+        <div className="overflow-hidden rounded-lg border border-stone-200/60">
+          {/* Header */}
+          <div className="grid grid-cols-6 bg-stone-50">
+            <div className="p-1.5 text-[9px] text-stone-400 font-mono" />
+            {days.map((d) => (
+              <div key={d} className={`p-1.5 text-center text-[10px] font-semibold ${d === "T2" ? "text-teal-700 bg-teal-50" : "text-stone-500"}`}>
+                {d}
+              </div>
+            ))}
+          </div>
+          {/* Grid */}
+          {hours.map((h) => (
+            <div key={h} className="grid grid-cols-6 border-t border-stone-100">
+              <div className="p-1.5 text-[9px] text-stone-400 font-mono flex items-center">{h}:00</div>
+              {days.map((d) => {
+                const slot = slots[`${d}-${h}`];
+                return (
+                  <div key={d} className="p-0.5 h-7 border-l border-stone-100">
+                    {slot && (
+                      <div className={`${slot.color} text-white text-[7px] font-semibold rounded px-1 py-0.5 h-full flex items-center`}>
+                        {slot.name}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function FeatureMockup({ type }: { type: string }) {
   const mockups: Record<string, React.ReactNode> = {
     "session-notes": (
@@ -822,52 +1040,7 @@ function FeatureMockup({ type }: { type: string }) {
         </div>
       </div>
     ),
-    "progress-dashboard": (
-      <div className="space-y-3">
-        <div className="flex items-center justify-between mb-2">
-          <div className="text-xs font-semibold text-stone-700">
-            PHQ-9 Progress
-          </div>
-          <div className="text-[11px] text-emerald-600 font-medium">
-            -38% so với baseline
-          </div>
-        </div>
-        {/* mini chart mockup */}
-        <div className="h-24 flex items-end gap-1.5 px-1">
-          {[18, 16, 15, 14, 12, 11, 9].map((v, i) => (
-            <div key={i} className="flex-1 flex flex-col items-center gap-1">
-              <div
-                className="w-full rounded-t-md transition-all duration-500"
-                style={{
-                  height: `${(v / 20) * 100}%`,
-                  background:
-                    v > 14
-                      ? "#ef4444"
-                      : v > 9
-                      ? "#f59e0b"
-                      : "#10b981",
-                }}
-              />
-              <span className="text-[9px] text-stone-400">T{i + 1}</span>
-            </div>
-          ))}
-        </div>
-        <div className="flex gap-3 pt-1">
-          <div className="flex items-center gap-1">
-            <div className="w-2 h-2 rounded-full bg-red-500" />
-            <span className="text-[10px] text-stone-500">Nặng</span>
-          </div>
-          <div className="flex items-center gap-1">
-            <div className="w-2 h-2 rounded-full bg-amber-500" />
-            <span className="text-[10px] text-stone-500">Trung bình</span>
-          </div>
-          <div className="flex items-center gap-1">
-            <div className="w-2 h-2 rounded-full bg-emerald-500" />
-            <span className="text-[10px] text-stone-500">Nhẹ</span>
-          </div>
-        </div>
-      </div>
-    ),
+    "progress-dashboard": <ProgressChartMockup />,
     "treatment-suggestions": (
       <div className="space-y-2.5">
         <div className="flex items-center gap-2 mb-3">
@@ -924,55 +1097,7 @@ function FeatureMockup({ type }: { type: string }) {
         </div>
       </div>
     ),
-    "smart-scheduling": (
-      <div className="space-y-2">
-        <div className="text-xs font-semibold text-stone-700 mb-3">
-          Thứ Hai, 17/02
-        </div>
-        {[
-          {
-            time: "09:00",
-            name: "Nguyễn Văn A",
-            type: "Follow-up",
-            color: "bg-teal-500",
-          },
-          {
-            time: "10:30",
-            name: "Trần Thị B",
-            type: "Initial",
-            color: "bg-blue-500",
-          },
-          {
-            time: "14:00",
-            name: "Lê Văn C",
-            type: "Crisis",
-            color: "bg-red-500",
-          },
-          {
-            time: "15:30",
-            name: "Phạm Thị D",
-            type: "Assessment",
-            color: "bg-purple-500",
-          },
-        ].map((s, i) => (
-          <div
-            key={i}
-            className="flex items-center gap-3 p-2 bg-white/80 rounded-lg border border-stone-200/60"
-          >
-            <div className="text-[11px] text-stone-400 font-mono w-10">
-              {s.time}
-            </div>
-            <div className={`w-1 h-8 rounded-full ${s.color}`} />
-            <div className="flex-1">
-              <div className="text-xs font-medium text-stone-700">
-                {s.name}
-              </div>
-              <div className="text-[10px] text-stone-400">{s.type}</div>
-            </div>
-          </div>
-        ))}
-      </div>
-    ),
+    "smart-scheduling": <ScheduleMockup />,
     telehealth: (
       <div className="space-y-3">
         {/* mock video */}
@@ -1124,7 +1249,7 @@ export default function LandingPage() {
               "@type": "Offer",
               price: "0",
               priceCurrency: "VND",
-              description: "Dùng thử miễn phí 14 ngày",
+              description: "Tham gia waitlist để trải nghiệm sớm nhất",
             },
           }),
         }}
@@ -1162,16 +1287,16 @@ export default function LandingPage() {
 
               <div className="mt-8 flex flex-col sm:flex-row gap-3">
                 <a
-                  href="#pricing"
+                  href="#waitlist-form"
                   onClick={(e) => {
                     e.preventDefault();
                     document
-                      .querySelector("#pricing")
-                      ?.scrollIntoView({ behavior: "smooth" });
+                      .querySelector("#waitlist-form")
+                      ?.scrollIntoView({ behavior: "smooth", block: "center" });
                   }}
                   className="inline-flex items-center justify-center gap-2 px-7 py-3.5 text-base font-semibold text-white bg-gradient-to-r from-teal-600 to-teal-700 rounded-xl shadow-lg shadow-teal-600/25 hover:shadow-xl hover:shadow-teal-600/30 hover:-translate-y-0.5 transition-all duration-200"
                 >
-                  Dùng thử miễn phí 14 ngày
+                  Tham gia waitlist
                   <Icon name="arrow-right" size={18} />
                 </a>
                 <a
@@ -1190,7 +1315,7 @@ export default function LandingPage() {
               </div>
 
               <p className="mt-4 text-sm text-stone-400">
-                Không cần thẻ tín dụng &middot; Setup trong 2 phút &middot;
+                Hoàn toàn miễn phí &middot; Được ưu tiên trải nghiệm sớm &middot;
                 Hủy bất cứ lúc nào
               </p>
             </div>
@@ -1364,7 +1489,7 @@ export default function LandingPage() {
             }}
             className="inline-flex items-center gap-2 px-7 py-3.5 text-base font-semibold text-white bg-gradient-to-r from-teal-600 to-teal-700 rounded-xl shadow-lg shadow-teal-600/25 hover:shadow-xl hover:-translate-y-0.5 transition-all duration-200"
           >
-            Bắt đầu ngay — Miễn phí
+            Tham gia waitlist ngay
             <Icon name="arrow-right" size={18} />
           </a>
         </div>
@@ -1378,8 +1503,8 @@ export default function LandingPage() {
             Chọn gói phù hợp với bạn
           </h2>
           <p className="mt-3 text-lg text-stone-500 max-w-2xl mx-auto">
-            Bắt đầu miễn phí, nâng cấp khi bạn sẵn sàng. Không cam kết dài
-            hạn.
+            Đăng ký waitlist để được ưu tiên trải nghiệm sớm nhất khi sản phẩm
+            ra mắt.
           </p>
         </div>
 
@@ -1438,14 +1563,14 @@ export default function LandingPage() {
         </div>
 
         {/* Lead capture form */}
-        <div className="max-w-xl mx-auto bg-gradient-to-br from-teal-700 to-teal-900 rounded-2xl p-7 md:p-10 text-white shadow-xl">
+        <div id="waitlist-form" className="max-w-xl mx-auto bg-gradient-to-br from-teal-700 to-teal-900 rounded-2xl p-7 md:p-10 text-white shadow-xl">
           <div className="text-center mb-6">
             <h3 className="text-2xl font-bold">
-              Bắt đầu dùng thử miễn phí
+              Đăng ký nhận quyền truy cập sớm
             </h3>
             <p className="mt-2 text-teal-100 text-sm">
-              Không cần thẻ tín dụng &middot; Setup trong 2 phút &middot; Hủy
-              bất cứ lúc nào
+              Hoàn toàn miễn phí &middot; Chỉ mất 30 giây &middot; Được ưu tiên
+              trải nghiệm sớm nhất
             </p>
           </div>
           <form onSubmit={handleSubmit} className="space-y-3">
@@ -1482,7 +1607,7 @@ export default function LandingPage() {
               type="submit"
               className="w-full py-3.5 px-4 bg-white text-teal-800 font-bold rounded-xl shadow-lg hover:bg-teal-50 hover:-translate-y-0.5 transition-all duration-200 text-sm"
             >
-              Dùng thử miễn phí 14 ngày
+              Tham gia waitlist
             </button>
           </form>
           <div className="mt-4 flex items-center justify-center gap-1.5 text-teal-200/80 text-xs">
@@ -1538,12 +1663,12 @@ export default function LandingPage() {
               }}
               className="inline-flex items-center gap-2 px-8 py-4 text-lg font-bold text-teal-800 bg-white rounded-xl shadow-xl hover:bg-teal-50 hover:-translate-y-0.5 transition-all duration-200"
             >
-              Dùng thử miễn phí 14 ngày
+              Tham gia waitlist
               <Icon name="arrow-right" size={20} />
             </a>
           </div>
           <p className="mt-4 text-sm text-teal-200/80">
-            Không cần thẻ tín dụng &middot; Setup trong 2 phút
+            Hoàn toàn miễn phí &middot; Được ưu tiên trải nghiệm sớm
           </p>
         </div>
       </section>
