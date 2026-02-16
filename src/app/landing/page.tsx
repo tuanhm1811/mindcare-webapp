@@ -480,6 +480,196 @@ function StickyHeader() {
   );
 }
 
+function HeroBeforeAfter() {
+  const [showAfter, setShowAfter] = useState(false);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setShowAfter(true), 2500);
+    return () => clearTimeout(timer);
+  }, []);
+
+  useEffect(() => {
+    if (!showAfter) return;
+    const interval = setInterval(() => {
+      setShowAfter((prev) => !prev);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [showAfter]);
+
+  return (
+    <div className="relative">
+      {/* Toggle */}
+      <div className="flex items-center justify-center gap-2 mb-4">
+        <button
+          onClick={() => setShowAfter(false)}
+          className={`px-4 py-1.5 rounded-full text-xs font-semibold transition-all duration-300 ${
+            !showAfter ? "bg-red-50 text-red-600 border border-red-200 shadow-sm" : "text-stone-400 hover:text-stone-600"
+          }`}
+        >
+          Hiện tại
+        </button>
+        <button
+          onClick={() => setShowAfter(true)}
+          className={`px-4 py-1.5 rounded-full text-xs font-semibold transition-all duration-300 ${
+            showAfter ? "bg-teal-50 text-teal-700 border border-teal-200 shadow-sm" : "text-stone-400 hover:text-stone-600"
+          }`}
+        >
+          Với TherapistAI
+        </button>
+      </div>
+
+      <div className="relative bg-white rounded-2xl shadow-2xl shadow-stone-900/10 border border-stone-200/60 overflow-hidden min-h-[320px]">
+        {/* ── BEFORE: Chaotic multi-tool workflow ── */}
+        <div className={`absolute inset-0 transition-all duration-700 ${!showAfter ? "opacity-100 scale-100" : "opacity-0 scale-95 pointer-events-none"}`}>
+          <div className="p-5 md:p-6 h-full flex flex-col">
+            <div className="text-[10px] font-semibold text-red-500 uppercase tracking-widest mb-4">Quy trình hiện tại</div>
+
+            {/* Scattered tool windows */}
+            <div className="flex-1 relative">
+              {/* Google Docs */}
+              <div className="absolute top-0 left-0 w-[55%] bg-white rounded-lg border border-stone-200 shadow-md p-2.5 rotate-[-2deg] z-10">
+                <div className="flex items-center gap-1.5 mb-2">
+                  <div className="w-4 h-4 rounded bg-blue-500 flex items-center justify-center text-[7px] text-white font-bold">D</div>
+                  <span className="text-[9px] text-stone-500">session_note_final_v3.docx</span>
+                </div>
+                <div className="space-y-1">
+                  <div className="h-1.5 bg-stone-100 rounded w-full" />
+                  <div className="h-1.5 bg-stone-100 rounded w-[80%]" />
+                  <div className="h-1.5 bg-stone-100 rounded w-[60%]" />
+                </div>
+              </div>
+
+              {/* Excel */}
+              <div className="absolute top-8 right-0 w-[50%] bg-white rounded-lg border border-stone-200 shadow-md p-2.5 rotate-[3deg] z-20">
+                <div className="flex items-center gap-1.5 mb-2">
+                  <div className="w-4 h-4 rounded bg-emerald-600 flex items-center justify-center text-[7px] text-white font-bold">X</div>
+                  <span className="text-[9px] text-stone-500">PHQ9_tracking.xlsx</span>
+                </div>
+                <div className="grid grid-cols-4 gap-0.5">
+                  {Array.from({ length: 12 }).map((_, i) => (
+                    <div key={i} className="h-2.5 bg-stone-50 border border-stone-200 rounded-sm text-[5px] text-stone-300 flex items-center justify-center">{i < 4 ? ["T1", "T2", "T3", "T4"][i] : ""}</div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Zoom */}
+              <div className="absolute bottom-8 left-[10%] w-[45%] bg-stone-800 rounded-lg shadow-md p-2.5 rotate-[1deg] z-30">
+                <div className="flex items-center gap-1.5 mb-2">
+                  <div className="w-4 h-4 rounded bg-blue-400 flex items-center justify-center text-[7px] text-white font-bold">Z</div>
+                  <span className="text-[9px] text-stone-400">Zoom Meeting</span>
+                </div>
+                <div className="flex gap-1">
+                  <div className="flex-1 h-8 bg-stone-700 rounded" />
+                  <div className="w-6 h-8 bg-stone-600 rounded" />
+                </div>
+              </div>
+
+              {/* Calendar */}
+              <div className="absolute bottom-2 right-[5%] w-[40%] bg-white rounded-lg border border-stone-200 shadow-md p-2.5 rotate-[-1deg] z-20">
+                <div className="flex items-center gap-1.5 mb-1.5">
+                  <div className="w-4 h-4 rounded bg-red-500 flex items-center justify-center text-[7px] text-white font-bold">C</div>
+                  <span className="text-[9px] text-stone-500">Google Calendar</span>
+                </div>
+                <div className="space-y-0.5">
+                  {["09:00 - Nguyễn V.A", "10:30 - Trần T.B"].map((t) => (
+                    <div key={t} className="text-[7px] text-stone-500 bg-blue-50 px-1.5 py-0.5 rounded">{t}</div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Frustration indicators */}
+              <div className="absolute top-[40%] left-[40%] z-40">
+                <div className="bg-red-50 border border-red-200 rounded-full px-2 py-0.5 text-[8px] text-red-500 font-medium animate-pulse">
+                  Alt+Tab...
+                </div>
+              </div>
+            </div>
+
+            {/* Bottom pain label */}
+            <div className="mt-3 flex items-center gap-2 text-[10px] text-red-500">
+              <Icon name="clock" size={12} />
+              <span>4+ công cụ &middot; Copy-paste liên tục &middot; Dữ liệu phân tán</span>
+            </div>
+          </div>
+        </div>
+
+        {/* ── AFTER: Clean TherapistAI dashboard ── */}
+        <div className={`absolute inset-0 transition-all duration-700 ${showAfter ? "opacity-100 scale-100" : "opacity-0 scale-105 pointer-events-none"}`}>
+          <div className="p-5 md:p-6 h-full flex flex-col">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <div className="w-6 h-6 rounded-lg overflow-hidden shrink-0">
+                  <img src="/logo.png" alt="logo" className="w-full h-full object-cover scale-[2]" />
+                </div>
+                <span className="text-xs font-bold text-stone-700">TherapistAI</span>
+                <div className="px-2 py-0.5 bg-teal-100 text-teal-700 text-[8px] font-semibold rounded-full">Tất cả trong 1</div>
+              </div>
+              <div className="flex items-center gap-1">
+                <div className="w-5 h-5 rounded-full bg-stone-100" />
+                <span className="text-[10px] text-stone-500">BS. Minh</span>
+              </div>
+            </div>
+
+            {/* AI Notes section */}
+            <div className="bg-teal-50/60 rounded-xl p-3 mb-3 border border-teal-100">
+              <div className="flex items-center gap-1.5 mb-2">
+                <Icon name="sparkles" size={10} className="text-teal-600" />
+                <span className="text-[10px] font-semibold text-teal-700">AI Session Notes</span>
+                <div className="ml-auto px-1.5 py-0.5 bg-emerald-100 text-emerald-700 text-[7px] font-semibold rounded-full">Hoàn tất 30s</div>
+              </div>
+              <div className="space-y-1">
+                <div className="h-1.5 bg-teal-200/50 rounded w-full" />
+                <div className="h-1.5 bg-teal-200/50 rounded w-[85%]" />
+                <div className="h-1.5 bg-teal-200/50 rounded w-[70%]" />
+              </div>
+            </div>
+
+            {/* Mini stats + chart */}
+            <div className="grid grid-cols-2 gap-2 mb-3">
+              <div className="bg-stone-50 rounded-lg p-2.5 border border-stone-100">
+                <div className="text-[9px] text-stone-500 mb-1">PHQ-9 Trend</div>
+                <div className="flex items-end gap-0.5 h-8">
+                  {[18, 15, 12, 9].map((v, i) => (
+                    <div key={i} className="flex-1 rounded-t" style={{ height: `${(v / 20) * 100}%`, background: v > 14 ? "#ef4444" : v > 9 ? "#f59e0b" : "#10b981" }} />
+                  ))}
+                </div>
+              </div>
+              <div className="bg-stone-50 rounded-lg p-2.5 border border-stone-100">
+                <div className="text-[9px] text-stone-500 mb-1">Gợi ý AI</div>
+                <div className="text-[10px] font-semibold text-stone-700">CBT — Tái cấu trúc</div>
+                <div className="flex items-center gap-1 mt-1">
+                  <div className="h-1 flex-1 bg-stone-200 rounded-full"><div className="h-full bg-emerald-500 rounded-full" style={{ width: "92%" }} /></div>
+                  <span className="text-[8px] text-emerald-600">92%</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Schedule */}
+            <div className="space-y-1">
+              {[
+                { time: "09:00", name: "Nguyễn V. A", tag: "Follow-up", cls: "bg-teal-100 text-teal-700" },
+                { time: "10:30", name: "Trần T. B", tag: "Initial", cls: "bg-blue-100 text-blue-700" },
+              ].map((s) => (
+                <div key={s.time} className="flex items-center gap-2 p-1.5 rounded-lg bg-white border border-stone-100">
+                  <span className="text-[9px] font-mono text-stone-400 w-7">{s.time}</span>
+                  <span className="text-[10px] font-medium text-stone-700 flex-1">{s.name}</span>
+                  <span className={`px-1.5 py-0.5 rounded text-[8px] font-semibold ${s.cls}`}>{s.tag}</span>
+                </div>
+              ))}
+            </div>
+
+            {/* Bottom benefit */}
+            <div className="mt-auto pt-3 flex items-center gap-2 text-[10px] text-teal-600">
+              <Icon name="check" size={12} />
+              <span>1 nền tảng &middot; AI hỗ trợ &middot; Tiết kiệm 2h mỗi ngày</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function FeatureMockup({ type }: { type: string }) {
   const mockups: Record<string, React.ReactNode> = {
     "session-notes": (
@@ -900,128 +1090,8 @@ export default function LandingPage() {
               </p>
             </div>
 
-            {/* Hero mockup */}
-            <div className="relative">
-              <div className="relative bg-white rounded-2xl shadow-2xl shadow-stone-900/10 border border-stone-200/60 overflow-hidden">
-                {/* Top bar */}
-                <div className="flex items-center gap-2 px-4 py-2.5 bg-stone-50 border-b border-stone-200/60">
-                  <div className="flex gap-1.5">
-                    <div className="w-2.5 h-2.5 rounded-full bg-red-400" />
-                    <div className="w-2.5 h-2.5 rounded-full bg-amber-400" />
-                    <div className="w-2.5 h-2.5 rounded-full bg-emerald-400" />
-                  </div>
-                  <div className="flex-1 flex justify-center">
-                    <div className="px-12 py-1 bg-white rounded-md border border-stone-200 text-[10px] text-stone-400">
-                      app.therapist.ai
-                    </div>
-                  </div>
-                </div>
-                {/* App content */}
-                <div className="p-4 md:p-5 space-y-4">
-                  {/* Mini header */}
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <div className="w-7 h-7 rounded-lg overflow-hidden shrink-0">
-                        <img src="/logo.png" alt="MindCare logo" className="w-full h-full object-cover scale-[2]" />
-                      </div>
-                      <span className="text-sm font-bold text-stone-700">
-                        TherapistAI
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-1.5">
-                      <div className="w-6 h-6 rounded-full bg-stone-100" />
-                      <div className="text-xs text-stone-500">BS. Minh</div>
-                    </div>
-                  </div>
-                  {/* Stats row */}
-                  <div className="grid grid-cols-3 gap-2">
-                    {[
-                      {
-                        label: "Thân chủ",
-                        val: "24",
-                        color: "from-teal-500 to-teal-600",
-                      },
-                      {
-                        label: "Hôm nay",
-                        val: "5",
-                        color: "from-blue-500 to-blue-600",
-                      },
-                      {
-                        label: "Ghi chú",
-                        val: "2",
-                        color: "from-amber-500 to-amber-600",
-                      },
-                    ].map((s) => (
-                      <div
-                        key={s.label}
-                        className="p-2.5 rounded-xl bg-stone-50 border border-stone-100"
-                      >
-                        <div
-                          className={`text-lg font-bold bg-gradient-to-r ${s.color} bg-clip-text text-transparent`}
-                        >
-                          {s.val}
-                        </div>
-                        <div className="text-[10px] text-stone-400">
-                          {s.label}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                  {/* Schedule preview */}
-                  <div className="space-y-1.5">
-                    <div className="text-[11px] font-semibold text-stone-500 uppercase tracking-wider">
-                      Lịch hôm nay
-                    </div>
-                    {[
-                      {
-                        time: "09:00",
-                        name: "Nguyễn V. A",
-                        badge: "Follow-up",
-                        bc: "bg-teal-100 text-teal-700",
-                      },
-                      {
-                        time: "10:30",
-                        name: "Trần T. B",
-                        badge: "Initial",
-                        bc: "bg-blue-100 text-blue-700",
-                      },
-                    ].map((a) => (
-                      <div
-                        key={a.time}
-                        className="flex items-center gap-2.5 p-2 rounded-lg bg-white border border-stone-100"
-                      >
-                        <span className="text-[10px] font-mono text-stone-400 w-8">
-                          {a.time}
-                        </span>
-                        <div className="flex-1 text-xs font-medium text-stone-700">
-                          {a.name}
-                        </div>
-                        <span
-                          className={`px-1.5 py-0.5 rounded text-[9px] font-semibold ${a.bc}`}
-                        >
-                          {a.badge}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-
-              {/* Floating badge */}
-              <div className="absolute -bottom-4 -left-4 md:-left-8 bg-white rounded-xl shadow-lg border border-stone-200/60 p-3 flex items-center gap-2.5 animate-float">
-                <div className="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center">
-                  <Icon name="check" size={16} className="text-emerald-600" />
-                </div>
-                <div>
-                  <div className="text-xs font-semibold text-stone-700">
-                    Ghi chú đã hoàn tất
-                  </div>
-                  <div className="text-[10px] text-stone-400">
-                    AI tạo trong 30 giây
-                  </div>
-                </div>
-              </div>
-            </div>
+            {/* Hero mockup - Before/After */}
+            <HeroBeforeAfter />
           </div>
         </div>
       </section>
