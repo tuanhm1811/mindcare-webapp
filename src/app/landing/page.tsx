@@ -5,8 +5,8 @@ import { useState, useEffect, useRef, useCallback } from "react";
 /* ───────────────────────── constants ───────────────────────── */
 
 const NAV_LINKS = [
+  { label: "Giới thiệu", href: "#about" },
   { label: "Tính năng", href: "#features" },
-  { label: "Cách hoạt động", href: "#how-it-works" },
   { label: "Bảng giá", href: "#pricing" },
   { label: "FAQ", href: "#faq" },
 ] as const;
@@ -146,15 +146,15 @@ const PLANS = [
 
 const FAQS = [
   {
-    q: "TherapistAI có an toàn cho dữ liệu thân chủ không?",
+    q: "MindCare có an toàn cho dữ liệu thân chủ không?",
     a: "Tuyệt đối. Chúng tôi sử dụng mã hóa AES-256 cho dữ liệu lưu trữ và TLS 1.3 cho dữ liệu truyền tải. Hệ thống tuân thủ tiêu chuẩn bảo mật quốc tế và có audit log cho mọi truy cập dữ liệu. Dữ liệu được lưu trên server tại Việt Nam.",
   },
   {
     q: "Tôi không giỏi công nghệ, có sử dụng được không?",
-    a: "TherapistAI được thiết kế cho chuyên gia tâm lý, không phải kỹ sư IT. Giao diện trực quan, hướng dẫn từng bước, và đội ngũ hỗ trợ sẵn sàng giúp bạn. Hầu hết người dùng thành thạo trong buổi đầu tiên.",
+    a: "MindCare được thiết kế cho chuyên gia tâm lý, không phải kỹ sư IT. Giao diện trực quan, hướng dẫn từng bước, và đội ngũ hỗ trợ sẵn sàng giúp bạn. Hầu hết người dùng thành thạo trong buổi đầu tiên.",
   },
   {
-    q: "TherapistAI có hỗ trợ tiếng Việt đầy đủ không?",
+    q: "MindCare có hỗ trợ tiếng Việt đầy đủ không?",
     a: "Có. Toàn bộ giao diện, AI ghi chú, và gợi ý trị liệu đều hỗ trợ tiếng Việt. AI được huấn luyện để hiểu ngữ cảnh tâm lý lâm sàng tiếng Việt, bao gồm cả thuật ngữ chuyên môn.",
   },
   {
@@ -162,8 +162,8 @@ const FAQS = [
     a: "Hiện tại sản phẩm đang trong giai đoạn phát triển. Bạn có thể tham gia waitlist để được ưu tiên trải nghiệm sớm nhất và hoàn toàn miễn phí. Sau khi ra mắt, gói Professional dự kiến từ 890.000đ/tháng.",
   },
   {
-    q: "TherapistAI hoạt động trên những thiết bị nào?",
-    a: "TherapistAI là ứng dụng web, hoạt động trên mọi thiết bị có trình duyệt: máy tính, laptop, tablet, và điện thoại. Được tối ưu cho Chrome, Firefox, Safari, và Edge.",
+    q: "MindCare hoạt động trên những thiết bị nào?",
+    a: "MindCare là ứng dụng web, hoạt động trên mọi thiết bị có trình duyệt: máy tính, laptop, tablet, và điện thoại. Được tối ưu cho Chrome, Firefox, Safari, và Edge.",
   },
   {
     q: "Làm sao để chuyển dữ liệu từ hệ thống cũ sang?",
@@ -415,7 +415,7 @@ function StickyHeader() {
             <img src="/logo.png" alt="MindCare logo" className="w-full h-full object-cover scale-[2]" />
           </div>
           <span className="text-xl font-bold text-stone-800 tracking-tight">
-            Therapist<span className="text-teal-700">AI</span>
+            Mind<span className="text-teal-700">Care</span>
           </span>
         </a>
 
@@ -596,7 +596,7 @@ function HeroComparisonSlider() {
                 <span
                   className="text-xs font-bold"
                   style={{ color: `rgb(${Math.round(68 - afterIntensity * 34)}, ${Math.round(68 + afterIntensity * 100)}, ${Math.round(68 + afterIntensity * 98)})` }}
-                >TherapistAI</span>
+                >MindCare</span>
                 <div className="w-6 h-6 rounded-lg overflow-hidden shrink-0">
                   <img src="/logo.png" alt="logo" className="w-full h-full object-cover scale-[2]" />
                 </div>
@@ -694,7 +694,7 @@ function HeroComparisonSlider() {
                 <div className="absolute top-0 left-0 w-[55%] bg-white rounded-lg border border-stone-200 shadow-md p-2.5 rotate-[-2deg] z-10">
                   <div className="flex items-center gap-1.5 mb-2">
                     <div className="w-4 h-4 rounded bg-blue-500 flex items-center justify-center text-[7px] text-white font-bold">D</div>
-                    <span className="text-[9px] text-stone-500">session_note_v3.docx</span>
+                    <span className="text-[9px] text-stone-500">docs dành cho ghi chép.docx</span>
                   </div>
                   <div className="space-y-1">
                     <div className="h-1.5 bg-stone-100 rounded w-full" />
@@ -706,7 +706,7 @@ function HeroComparisonSlider() {
                 <div className="absolute top-8 right-0 w-[50%] bg-white rounded-lg border border-stone-200 shadow-md p-2.5 rotate-[3deg] z-20">
                   <div className="flex items-center gap-1.5 mb-2">
                     <div className="w-4 h-4 rounded bg-emerald-600 flex items-center justify-center text-[7px] text-white font-bold">X</div>
-                    <span className="text-[9px] text-stone-500">PHQ9_tracking.xlsx</span>
+                    <span className="text-[9px] text-stone-500">excel cho lưu trữ.xlsx</span>
                   </div>
                   <div className="grid grid-cols-4 gap-0.5">
                     {Array.from({ length: 12 }).map((_, i) => (
@@ -718,7 +718,7 @@ function HeroComparisonSlider() {
                 <div className="absolute bottom-8 left-[10%] w-[45%] bg-stone-800 rounded-lg shadow-md p-2.5 rotate-[1deg] z-30">
                   <div className="flex items-center gap-1.5 mb-2">
                     <div className="w-4 h-4 rounded bg-blue-400 flex items-center justify-center text-[7px] text-white font-bold">Z</div>
-                    <span className="text-[9px] text-stone-400">Zoom Meeting</span>
+                    <span className="text-[9px] text-stone-400">Zoom/Google Meeting</span>
                   </div>
                   <div className="flex gap-1">
                     <div className="flex-1 h-8 bg-stone-700 rounded" />
@@ -729,7 +729,7 @@ function HeroComparisonSlider() {
                 <div className="absolute bottom-2 right-[5%] w-[40%] bg-white rounded-lg border border-stone-200 shadow-md p-2.5 rotate-[-1deg] z-20">
                   <div className="flex items-center gap-1.5 mb-1.5">
                     <div className="w-4 h-4 rounded bg-red-500 flex items-center justify-center text-[7px] text-white font-bold">C</div>
-                    <span className="text-[9px] text-stone-500">Google Calendar</span>
+                    <span className="text-[9px] text-stone-500">Calendar cho xếp lịch</span>
                   </div>
                   <div className="space-y-0.5">
                     {["09:00 - Nguyễn V.A", "10:30 - Trần T.B"].map((t) => (
@@ -739,15 +739,13 @@ function HeroComparisonSlider() {
                 </div>
 
                 <div className="absolute top-[40%] left-[40%] z-40">
-                  <div className="bg-red-50 border border-red-200 rounded-full px-2 py-0.5 text-[8px] text-red-500 font-medium animate-pulse">
-                    Alt+Tab...
-                  </div>
+                  
                 </div>
               </div>
 
               <div className="mt-3 flex items-center gap-2 text-[10px] text-red-500">
                 <Icon name="clock" size={12} />
-                <span>4+ công cụ &middot; Copy-paste liên tục &middot; Dữ liệu phân tán</span>
+                <span>4+ công cụ &middot; Copy-paste liên tục &middot; Dữ liệu phân tán &middot; Rủi ro bảo mật dữ liệu</span>
               </div>
             </div>
           </div>
@@ -1302,7 +1300,7 @@ export default function LandingPage() {
           __html: JSON.stringify({
             "@context": "https://schema.org",
             "@type": "SoftwareApplication",
-            name: "TherapistAI",
+            name: "MindCare",
             applicationCategory: "HealthApplication",
             operatingSystem: "Web",
             description:
@@ -1342,9 +1340,9 @@ export default function LandingPage() {
               </h1>
 
               <p className="mt-5 text-lg md:text-xl text-stone-600 leading-relaxed max-w-lg">
-                TherapistAI tự động hóa ghi chú phiên trị liệu, theo dõi tiến
-                trình thân chủ, và hỗ trợ ra quyết định lâm sàng — để bạn
-                tập trung vào điều quan trọng nhất.
+                MindCare tự động hóa ghi chú phiên trị liệu, theo dõi tiến
+                trình thân chủ, và hỗ trợ sắp xếp lịch trình — để bạn
+                tập trung vào quá trình trị liệu tâm lý.
               </p>
 
               <div className="mt-8 flex flex-col sm:flex-row gap-3">
@@ -1377,8 +1375,8 @@ export default function LandingPage() {
               </div>
 
               <p className="mt-4 text-sm text-stone-400">
-                Hoàn toàn miễn phí &middot; Được ưu tiên trải nghiệm sớm &middot;
-                Hủy bất cứ lúc nào
+                Ưu tiên trải nghiệm sớm &middot;
+                Hoàn toàn miễn phí 
               </p>
             </div>
 
@@ -1422,7 +1420,7 @@ export default function LandingPage() {
       </Section>
 
       {/* ════════════════ S4: SOLUTION OVERVIEW ════════════════ */}
-      <Section>
+      <Section id="about">
         <div className="max-w-3xl mx-auto text-center">
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-teal-50 border border-teal-200/60 rounded-full mb-6">
             <Icon name="sparkles" size={16} className="text-teal-600" />
@@ -1432,20 +1430,19 @@ export default function LandingPage() {
           </div>
 
           <h2 className="text-3xl md:text-4xl font-extrabold text-stone-900 tracking-tight leading-tight">
-            TherapistAI — Trợ lý AI
+            MindCare — Trợ lý AI
             <br className="hidden md:block" /> được thiết kế riêng cho bạn
           </h2>
 
           <p className="mt-5 text-lg text-stone-600 leading-relaxed max-w-2xl mx-auto">
             Một nền tảng duy nhất thay thế hàng chục công cụ rời rạc. Từ ghi
             chú phiên trị liệu, theo dõi tiến trình, quản lý lịch hẹn, đến
-            video call bảo mật — tất cả được hỗ trợ bởi AI hiểu ngữ cảnh tâm
-            lý lâm sàng tiếng Việt.
+            video call bảo mật — tất cả được hỗ trợ bởi AI được huấn luyện để hiểu ngữ cảnh tâm lý lâm sàng bằng tiếng Việt.
           </p>
 
           <div className="mt-8 flex flex-wrap items-center justify-center gap-x-6 gap-y-3 text-sm text-stone-500">
             {[
-              "Tiết kiệm 2+ giờ mỗi ngày",
+              "Tiết kiệm 3+ giờ mỗi ngày",
               "Không cần cài đặt",
               "Hỗ trợ tiếng Việt đầy đủ",
               "Setup trong 2 phút",
@@ -1688,7 +1685,7 @@ export default function LandingPage() {
           <p className="mt-3 text-lg text-stone-500">
             Chưa tìm thấy câu trả lời?{" "}
             <a
-              href="mailto:support@therapist.ai"
+              href="mailto:support@mindcare.vn"
               className="text-teal-700 font-medium underline underline-offset-2 hover:text-teal-800"
             >
               Liên hệ chúng tôi
@@ -1711,7 +1708,7 @@ export default function LandingPage() {
             <br className="hidden md:block" /> cho thân chủ của bạn?
           </h2>
           <p className="mt-4 text-lg text-teal-100 max-w-2xl mx-auto">
-            TherapistAI giúp bạn tiết kiệm thời gian và nâng cao chất lượng
+            MindCare giúp bạn tiết kiệm thời gian và nâng cao chất lượng
             trị liệu mỗi ngày.
           </p>
           <div className="mt-8">
@@ -1746,7 +1743,7 @@ export default function LandingPage() {
                   <img src="/logo.png" alt="MindCare logo" className="w-full h-full object-cover scale-[2]" />
                 </div>
                 <span className="text-lg font-bold text-white">
-                  Therapist<span className="text-teal-400">AI</span>
+                  Mind<span className="text-teal-400">Care</span>
                 </span>
               </div>
               <p className="text-sm leading-relaxed">
@@ -1817,7 +1814,7 @@ export default function LandingPage() {
               <ul className="space-y-2.5 text-sm">
                 <li className="flex items-center gap-2">
                   <Icon name="mail" size={14} />
-                  support@therapist.ai
+                  support@mindcare.vn
                 </li>
                 <li className="flex items-center gap-2">
                   <Icon name="phone" size={14} />
@@ -1837,7 +1834,7 @@ export default function LandingPage() {
 
           <div className="mt-12 pt-8 border-t border-stone-800 flex flex-col md:flex-row items-center justify-between gap-4">
             <p className="text-xs text-stone-500">
-              &copy; {new Date().getFullYear()} TherapistAI. All rights
+              &copy; {new Date().getFullYear()} MindCare. All rights
               reserved.
             </p>
             <div className="flex items-center gap-2 text-xs text-stone-500">
