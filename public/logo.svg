@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 220" fill="none" stroke="#5F9EA0" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
+  <!-- Face profile (left-facing) starting from chin, going up around forehead, connecting to leaf -->
+  <path d="
+    M 82 175
+    C 78 168, 74 162, 72 156
+    C 70 150, 74 146, 78 142
+    C 80 140, 80 137, 78 134
+    C 74 129, 70 123, 68 116
+    C 65 106, 67 95, 72 86
+    C 78 76, 86 69, 96 64
+    C 106 59, 116 60, 124 66
+    C 130 70, 134 76, 132 82
+  "/>
+  <!-- Leaf outline from top of head sweeping right and up -->
+  <path d="
+    M 124 66
+    C 130 56, 140 44, 148 36
+    C 153 31, 156 28, 155 24
+    C 154 19, 149 17, 143 20
+    C 134 26, 126 36, 120 48
+    C 114 60, 112 72, 116 84
+  "/>
+  <!-- Leaf center vein -->
+  <path d="
+    M 128 70
+    C 130 58, 136 46, 145 34
+  "/>
+</svg>
